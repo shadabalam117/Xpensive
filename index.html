@@ -1,9 +1,10 @@
 <!doctype html>
+
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Xpensive — Expense Tracker</title>
+  <title>Xpensive — Expense Tracker (Fixed)</title>
   <style>
     :root{
       --brand:#22c55e; --brand-dark:#16a34a; --bg:#f4f6f8; --card:#fff;
@@ -52,126 +53,118 @@
 </head>
 <body>
   <header>💰 Xpensive — Expense Tracker</header>
-  <main>
+  <main><!-- AUTH Card -->
+<section id="authCard" class="card">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+    <div>
+      <div style="font-size:18px;font-weight:700">Sign in or Create account</div>
+      <div class="small muted">Use Email/Password to keep your expenses private.</div>
+    </div>
+    <div id="userInfo" class="hidden" style="text-align:right">
+      <div class="small muted">Signed in as</div>
+      <div id="userEmail" style="font-weight:700"></div>
+      <div style="margin-top:8px"><button id="signOut" class="secondary">Sign out</button></div>
+    </div>
+  </div>
 
-    <!-- AUTH Card -->
-    <section id="authCard" class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
-        <div>
-          <div style="font-size:18px;font-weight:700">Sign in or Create account</div>
-          <div class="small muted">Use Email/Password or Google to keep your expenses private.</div>
-        </div>
-        <div id="userInfo" class="hidden" style="text-align:right">
-          <div class="small muted">Signed in as</div>
-          <div id="userEmail" style="font-weight:700"></div>
-          <div style="margin-top:8px"><button id="signOut" class="secondary">Sign out</button></div>
-        </div>
+  <div id="authForms" style="margin-top:12px">
+    <input id="nameField" type="text" placeholder="Full name (for signup)" />
+    <input id="emailField" type="email" placeholder="Email" />
+    <input id="passwordField" type="password" placeholder="Password (min 6 chars)" />
+    <div id="authBtns">
+      <button id="signInBtn" class="secondary">Sign in</button>
+      <button id="signUpBtn" class="primary">Create account</button>
+    </div>
+    <div id="authError" class="error hidden"></div>
+  </div>
+</section>
+
+<!-- APP: visible after auth -->
+<section id="app" class="hidden">
+  <!-- top: user + filters + totals -->
+  <div class="card summary">
+    <div style="display:flex;gap:10px;align-items:center;">
+      <div>
+        <div class="small muted">Logged in as</div>
+        <div id="me" style="font-weight:800"></div>
+      </div>
+      <div class="chip"><button id="signOutBtn" class="secondary">Sign out</button></div>
+    </div>
+
+    <div style="display:flex;gap:10px;align-items:center;">
+      <label for="monthPicker" class="small muted" style="margin:0 8px 0 0">Month</label>
+      <input id="monthPicker" type="month" />
+      <label for="yearPicker" class="small muted" style="margin:0 8px 0 0">Year</label>
+      <select id="yearPicker" class="chip"><option value="all">All years</option></select>
+    </div>
+
+    <div style="text-align:right">
+      <div class="small muted">All-time total</div>
+      <div id="allTimeTotal" class="big">₹0</div>
+    </div>
+  </div>
+
+  <!-- add expense -->
+  <section class="card">
+    <div class="grid">
+      <div>
+        <label for="date">Date</label>
+        <input id="date" type="date" />
+      </div>
+      <div>
+        <label for="category">Category</label>
+        <select id="category">
+          <option value="" disabled selected>Select category</option>
+          <option value="Food">Food</option>
+          <option value="Transport">Transport</option>
+          <option value="Shopping">Shopping</option>
+          <option value="Bills">Bills</option>
+          <option value="Other">Other</option>
+        </select>
       </div>
 
-      <div id="authForms" style="margin-top:12px">
-        <input id="nameField" type="text" placeholder="Full name (for signup)" />
-        <input id="emailField" type="email" placeholder="Email" />
-        <input id="passwordField" type="password" placeholder="Password (min 6 chars)" />
-        <div id="authBtns">
-          <button id="signInBtn" class="secondary">Sign in</button>
-          <button id="signUpBtn" class="primary">Create account</button>
+      <div id="notesWrap" style="display:none">
+        <label for="notes">Notes (required for "Other")</label>
+        <textarea id="notes" placeholder="Describe the expense..."></textarea>
+      </div>
+
+      <div>
+        <label for="amount">Amount (₹)</label>
+        <input id="amount" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00" />
+      </div>
+
+      <div style="grid-column:1 / -1">
+        <div class="row" style="align-items:center;justify-content:space-between">
+          <div class="small muted">Selected view total</div>
+          <div class="big right">₹<span id="selectedTotal">0</span></div>
         </div>
         <div style="margin-top:10px">
-          <button id="googleBtn" class="secondary">Sign in with Google</button>
+          <button id="addBtn" class="primary">+ Add Expense</button>
         </div>
-        <div id="authError" class="error hidden"></div>
+        <div id="appError" class="error hidden"></div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- APP: visible after auth -->
-    <section id="app" class="hidden">
-      <!-- top: user + filters + totals -->
-      <div class="card summary">
-        <div style="display:flex;gap:10px;align-items:center;">
-          <div>
-            <div class="small muted">Logged in as</div>
-            <div id="me" style="font-weight:800"></div>
-          </div>
-          <div class="chip"><button id="signOutBtn" class="secondary">Sign out</button></div>
-        </div>
+  <!-- table -->
+  <section class="card">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Date</th><th>Category</th><th>Amount</th><th>Notes</th><th>Action</th></tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </section>
+</section>
 
-        <div style="display:flex;gap:10px;align-items:center;">
-          <label for="monthPicker" class="small muted" style="margin:0 8px 0 0">Month</label>
-          <input id="monthPicker" type="month" />
-          <label for="yearPicker" class="small muted" style="margin:0 8px 0 0">Year</label>
-          <select id="yearPicker" class="chip"><option value="all">All years</option></select>
-        </div>
-
-        <div style="text-align:right">
-          <div class="small muted">All-time total</div>
-          <div id="allTimeTotal" class="big">₹0</div>
-        </div>
-      </div>
-
-      <!-- add expense -->
-      <section class="card">
-        <div class="grid">
-          <div>
-            <label for="date">Date</label>
-            <input id="date" type="date" />
-          </div>
-          <div>
-            <label for="category">Category</label>
-            <select id="category">
-              <option value="" disabled selected>Select category</option>
-              <option value="Food">Food</option>
-              <option value="Transport">Transport</option>
-              <option value="Shopping">Shopping</option>
-              <option value="Bills">Bills</option>
-              <option value="Other">Other</option>
-            </select>
-          </div>
-
-          <div id="notesWrap" style="display:none">
-            <label for="notes">Notes (required for "Other")</label>
-            <textarea id="notes" placeholder="Describe the expense..."></textarea>
-          </div>
-
-          <div>
-            <label for="amount">Amount (₹)</label>
-            <input id="amount" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00" />
-          </div>
-
-          <div style="grid-column:1 / -1">
-            <div class="row" style="align-items:center;justify-content:space-between">
-              <div class="small muted">Selected view total</div>
-              <div class="big right">₹<span id="selectedTotal">0</span></div>
-            </div>
-            <div style="margin-top:10px">
-              <button id="addBtn" class="primary">+ Add Expense</button>
-            </div>
-            <div id="appError" class="error hidden"></div>
-          </div>
-        </div>
-      </section>
-
-      <!-- table -->
-      <section class="card">
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr><th>Date</th><th>Category</th><th>Amount</th><th>Notes</th><th>Action</th></tr>
-            </thead>
-            <tbody id="tbody"></tbody>
-          </table>
-        </div>
-      </section>
-    </section>
-
-  </main>
-
-  <!-- Firebase (ESM v12) -->
-  <script type="module">
+  </main>  <!-- Firebase (ESM v12) -->  <script type="module">
     /* ================== imports ================== */
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
     import {
       getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut,
-      onAuthStateChanged, GoogleAuthProvider, signInWithPopup, updateProfile
+      onAuthStateChanged, updateProfile
     } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
     import {
       getFirestore, collection, addDoc, deleteDoc, doc,
@@ -208,7 +201,6 @@
     const passwordField = document.getElementById("passwordField");
     const signInBtn = document.getElementById("signInBtn");
     const signUpBtn = document.getElementById("signUpBtn");
-    const googleBtn = document.getElementById("googleBtn");
 
     const appSection = document.getElementById("app");
     const me = document.getElementById("me");
@@ -240,6 +232,26 @@
       }
     });
 
+    /* ================ friendly error messages ================ */
+    function friendlyAuthError(err){
+      // Firebase errors often have .code like 'auth/email-already-in-use'
+      const code = (err && err.code) ? String(err.code) : (err && err.message ? String(err.message) : '');
+      const m = String(code).match(/auth\/(.+)$/);
+      const key = m ? m[1] : code;
+      const map = {
+        'email-already-in-use': 'That email is already registered. Try signing in or use another email.',
+        'invalid-email': 'This email address looks invalid.',
+        'user-not-found': 'No account found with that email.',
+        'wrong-password': 'Incorrect password. Please try again.',
+        'weak-password': 'Password should be at least 6 characters.',
+        'popup-closed-by-user': 'Sign-in popup was closed. Try again.',
+        'popup-blocked': 'Popup blocked by browser. Allow popups and try again.'
+      };
+      if (map[key]) return map[key];
+      // fallback: try to clean the message a bit
+      return (err && err.message) ? String(err.message).replace(/^Firebase:\s*/i, '') : 'An unexpected error occurred.';
+    }
+
     /* ================ Auth handlers ================ */
     signUpBtn.addEventListener("click", async () => {
       authError.classList.add("hidden"); authError.textContent = "";
@@ -254,7 +266,7 @@
         }
         // success — onAuthStateChanged will handle UI
       } catch (err) {
-        authError.textContent = err.message || "Signup failed"; authError.classList.remove("hidden");
+        authError.textContent = friendlyAuthError(err); authError.classList.remove("hidden");
       }
     });
 
@@ -266,17 +278,7 @@
       try {
         await signInWithEmailAndPassword(auth, email, pwd);
       } catch (err) {
-        authError.textContent = err.message || "Signin failed"; authError.classList.remove("hidden");
-      }
-    });
-
-    googleBtn.addEventListener("click", async () => {
-      authError.classList.add("hidden"); authError.textContent = "";
-      try {
-        const provider = new GoogleAuthProvider();
-        await signInWithPopup(auth, provider);
-      } catch (err) {
-        authError.textContent = err.message || "Google sign in failed"; authError.classList.remove("hidden");
+        authError.textContent = friendlyAuthError(err); authError.classList.remove("hidden");
       }
     });
 
@@ -290,6 +292,29 @@
 
     function userExpensesRef(uid){ return collection(db, "users", uid, "expenses"); }
     function fmt(n){ return Number(n).toLocaleString(); }
+
+    /* helper: normalize expense doc data so UI code doesn't break when Firestore has mixed types */
+    function normalizeExpenseData(d){
+      const out = Object.assign({}, d);
+      // amount: ensure number
+      if (typeof out.amount === 'string') out.amount = parseFloat(out.amount) || 0;
+      if (typeof out.amount !== 'number') out.amount = Number(out.amount) || 0;
+
+      // date: convert Firestore Timestamp -> YYYY-MM-DD string, or ensure string
+      if (out.date && typeof out.date === 'object' && typeof out.date.toDate === 'function'){
+        try { out.date = out.date.toDate().toISOString().slice(0,10); } catch(e){ out.date = '' }
+      } else if (typeof out.date === 'number'){
+        // epoch millis
+        try { out.date = new Date(out.date).toISOString().slice(0,10); } catch(e){ out.date = '' }
+      } else if (typeof out.date !== 'string'){
+        out.date = out.date ? String(out.date) : '';
+      }
+
+      out.category = out.category || 'Other';
+      out.notes = out.notes || '';
+      out.uid = out.uid || '';
+      return out;
+    }
 
     /* ================ Auth state watcher ================ */
     onAuthStateChanged(auth, user => {
@@ -328,9 +353,8 @@
         allExpenses = [];
         snap.forEach(s => {
           const d = s.data();
-          // ensure amount is number
-          if (typeof d.amount === "string") d.amount = parseFloat(d.amount) || 0;
-          allExpenses.push({ id: s.id, ...d });
+          const norm = normalizeExpenseData(d);
+          allExpenses.push({ id: s.id, ...norm });
         });
         populateYearPicker();
         renderFilteredData();
@@ -346,7 +370,7 @@
       appError.classList.add("hidden"); appError.textContent = "";
       if (!currentUser) { appError.textContent = "Please sign in first."; appError.classList.remove("hidden"); return; }
 
-      const date = dateEl.value;
+      const date = dateEl.value; // YYYY-MM-DD
       const category = catEl.value;
       const amount = parseFloat(amtEl.value);
       const notes = (category === "Other") ? (notesEl.value || "").trim() : "";
@@ -359,16 +383,21 @@
       }
 
       try {
-        // include uid in the doc for additional security checks if you want
+        addBtn.disabled = true; addBtn.textContent = 'Adding...';
+        // store date explicitly as string (YYYY-MM-DD). This avoids mixed Timestamp/string issues.
         await addDoc(userExpensesRef(currentUser.uid), {
           uid: currentUser.uid,
-          date, category, amount, notes
+          date: date,
+          category, amount: Number(amount), notes
         });
         amtEl.value = ""; if (category === "Other") notesEl.value = "";
         amtEl.focus();
       } catch (err) {
         console.error(err);
-        appError.textContent = "Failed to add expense. Try again."; appError.classList.remove("hidden");
+        appError.textContent = "Failed to add expense. Try again.";
+        appError.classList.remove("hidden");
+      } finally {
+        addBtn.disabled = false; addBtn.textContent = '+ Add Expense';
       }
     });
 
@@ -391,12 +420,13 @@
     /* ================ Filtering & render ================ */
     function populateYearPicker(){
       const years = new Set();
-      allExpenses.forEach(e => { if (e.date) years.add(String(e.date).slice(0,4)); });
+      allExpenses.forEach(e => { if (e.date && typeof e.date === 'string' && e.date.length>=4) years.add(String(e.date).slice(0,4)); });
       const arr = Array.from(years).sort((a,b)=>b-a);
       const cur = yearPicker.value || "all";
       yearPicker.innerHTML = '<option value="all">All years</option>';
       arr.forEach(y => { const opt = document.createElement("option"); opt.value = y; opt.textContent = y; yearPicker.appendChild(opt); });
-      yearPicker.value = arr.includes(cur) ? cur : (arr.length ? arr[0] : "all");
+      // keep previous selection if possible
+      if (arr.includes(cur)) yearPicker.value = cur; else yearPicker.value = (arr.length ? arr[0] : "all");
     }
 
     function renderFilteredData(){
@@ -409,6 +439,9 @@
         if (yearVal && yearVal !== "all") return String(e.date).startsWith(yearVal);
         return true;
       });
+
+      // sort by date desc (strings in YYYY-MM-DD sort correctly)
+      filtered.sort((a,b) => (b.date||'').localeCompare(a.date||''));
 
       // render rows
       tbody.innerHTML = "";
@@ -438,18 +471,14 @@
       renderFilteredData();
     });
     yearPicker.addEventListener("change", () => {
-      if (yearPicker.value === "all") monthPicker.value = "";
-      else monthPicker.value = "";
+      // when year changed we reset month (you can change behavior if you want month+year selection)
+      monthPicker.value = "";
       renderFilteredData();
     });
 
     // initial empty render
     renderFilteredData();
 
-    /* ================ Notes ================ */
-    // (already handled by catEl change listener above)
-
     /* ================ End ================ */
-  </script>
-</body>
-</html>
+  </script></body>
+  </html>
