@@ -3,20 +3,21 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Xpensive — Multiuser Expense Tracker</title>
+  <title>Xpensive — Expense Tracker</title>
   <style>
     :root{
-      --brand:#22c55e;--brand-dark:#16a34a;--bg:#f4f6f8;--card:#fff;
-      --text:#111827;--muted:#6b7280;--danger:#ef4444;--radius:12px;
+      --brand:#22c55e; --brand-dark:#16a34a; --bg:#f4f6f8; --card:#fff;
+      --text:#111827; --muted:#6b7280; --danger:#ef4444; --radius:12px;
     }
     *{box-sizing:border-box}
     body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
     header{background:var(--brand);color:#fff;padding:14px 16px;text-align:center;font-weight:700;font-size:20px;box-shadow:0 2px 10px rgba(0,0,0,.06)}
-    main{max-width:820px;margin:18px auto;padding:0 14px}
+    main{max-width:920px;margin:18px auto;padding:0 14px}
     .card{background:var(--card);border-radius:var(--radius);padding:14px;margin-bottom:14px;box-shadow:0 6px 24px rgba(0,0,0,.06)}
     .row{display:flex;gap:12px;align-items:center}
     .col{flex:1}
     .muted{color:var(--muted)}
+    .hidden{display:none}
     /* auth */
     #authCard input, #authCard button {width:100%;padding:10px;margin-top:8px;border-radius:8px;border:1px solid #e6e6e6;font-size:15px}
     #authBtns{display:flex;gap:8px;margin-top:10px}
@@ -41,8 +42,8 @@
     .summary{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
     .big{font-weight:800;font-size:18px}
     .chip{background:#f3f4f6;padding:6px 10px;border-radius:999px;border:1px solid #e6e6e6}
-    .hidden{display:none}
     .right{text-align:right}
+    .error{color:var(--danger);font-size:14px;margin-top:8px}
     @media (max-width:520px){
       .grid{grid-template-columns:1fr}
       table{min-width:560px}
@@ -53,17 +54,17 @@
   <header>💰 Xpensive — Expense Tracker</header>
   <main>
 
-    <!-- AUTH: shown when not signed in -->
+    <!-- AUTH Card -->
     <section id="authCard" class="card">
-      <div class="row" style="justify-content:space-between;align-items:center">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
         <div>
           <div style="font-size:18px;font-weight:700">Sign in or Create account</div>
           <div class="small muted">Use Email/Password or Google to keep your expenses private.</div>
         </div>
-        <div id="userInfo" class="hidden">
+        <div id="userInfo" class="hidden" style="text-align:right">
           <div class="small muted">Signed in as</div>
           <div id="userEmail" style="font-weight:700"></div>
-          <div style="margin-top:8px"><button id="signOut" class="secondary hidden">Sign out</button></div>
+          <div style="margin-top:8px"><button id="signOut" class="secondary">Sign out</button></div>
         </div>
       </div>
 
@@ -78,28 +79,27 @@
         <div style="margin-top:10px">
           <button id="googleBtn" class="secondary">Sign in with Google</button>
         </div>
+        <div id="authError" class="error hidden"></div>
       </div>
     </section>
 
-    <!-- App area (hidden until auth) -->
+    <!-- APP: visible after auth -->
     <section id="app" class="hidden">
-      <!-- top bar: user + month/year filters -->
+      <!-- top: user + filters + totals -->
       <div class="card summary">
         <div style="display:flex;gap:10px;align-items:center;">
           <div>
             <div class="small muted">Logged in as</div>
             <div id="me" style="font-weight:800"></div>
           </div>
-          <div class="chip" id="signOutWrap"><button id="signOutBtn" class="secondary">Sign out</button></div>
+          <div class="chip"><button id="signOutBtn" class="secondary">Sign out</button></div>
         </div>
 
         <div style="display:flex;gap:10px;align-items:center;">
           <label for="monthPicker" class="small muted" style="margin:0 8px 0 0">Month</label>
           <input id="monthPicker" type="month" />
           <label for="yearPicker" class="small muted" style="margin:0 8px 0 0">Year</label>
-          <select id="yearPicker" class="chip">
-            <option value="all">All years</option>
-          </select>
+          <select id="yearPicker" class="chip"><option value="all">All years</option></select>
         </div>
 
         <div style="text-align:right">
@@ -108,7 +108,7 @@
         </div>
       </div>
 
-      <!-- Add expense -->
+      <!-- add expense -->
       <section class="card">
         <div class="grid">
           <div>
@@ -126,14 +126,17 @@
               <option value="Other">Other</option>
             </select>
           </div>
+
           <div id="notesWrap" style="display:none">
             <label for="notes">Notes (required for "Other")</label>
             <textarea id="notes" placeholder="Describe the expense..."></textarea>
           </div>
+
           <div>
             <label for="amount">Amount (₹)</label>
             <input id="amount" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00" />
           </div>
+
           <div style="grid-column:1 / -1">
             <div class="row" style="align-items:center;justify-content:space-between">
               <div class="small muted">Selected view total</div>
@@ -142,11 +145,12 @@
             <div style="margin-top:10px">
               <button id="addBtn" class="primary">+ Add Expense</button>
             </div>
+            <div id="appError" class="error hidden"></div>
           </div>
         </div>
       </section>
 
-      <!-- Table -->
+      <!-- table -->
       <section class="card">
         <div class="table-wrap">
           <table>
@@ -161,9 +165,9 @@
 
   </main>
 
-  <!-- Firebase (ESM) -->
+  <!-- Firebase (ESM v12) -->
   <script type="module">
-    /* ========= Firebase imports (v12.x ESM) ========= */
+    /* ================== imports ================== */
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
     import {
       getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut,
@@ -174,7 +178,7 @@
       onSnapshot, query, orderBy
     } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
-    /* ========= Your firebase config ========= */
+    /* ================ config (your project) ================ */
     const firebaseConfig = {
       apiKey: "AIzaSyD-0R_Sh_J8uCMV40W7qKYYFPH90gWum9U",
       authDomain: "expense-tracker-a611b.firebaseapp.com",
@@ -185,22 +189,20 @@
       measurementId: "G-4XBWGDTX2K"
     };
 
-    /* ========= Init ========= */
+    /* ================= init ================ */
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    /* ========= UI refs ========= */
+    /* ================ UI refs ================ */
     const authCard = document.getElementById("authCard");
     const authForms = document.getElementById("authForms");
+    const authError = document.getElementById("authError");
     const userInfo = document.getElementById("userInfo");
     const userEmail = document.getElementById("userEmail");
     const signOutBtn = document.getElementById("signOutBtn");
-    const signOut = document.getElementById("signOut");
-    const appSection = document.getElementById("app");
-    const me = document.getElementById("me");
+    const signOutTop = document.getElementById("signOut");
 
-    // auth inputs
     const nameField = document.getElementById("nameField");
     const emailField = document.getElementById("emailField");
     const passwordField = document.getElementById("passwordField");
@@ -208,7 +210,8 @@
     const signUpBtn = document.getElementById("signUpBtn");
     const googleBtn = document.getElementById("googleBtn");
 
-    // app inputs
+    const appSection = document.getElementById("app");
+    const me = document.getElementById("me");
     const dateEl = document.getElementById("date");
     const catEl = document.getElementById("category");
     const notesWrap = document.getElementById("notesWrap");
@@ -217,15 +220,15 @@
     const addBtn = document.getElementById("addBtn");
     const tbody = document.getElementById("tbody");
     const selectedTotalEl = document.getElementById("selectedTotal");
-    const monthlyTotalEl = document.getElementById("monthlyTotal");
     const allTimeTotalEl = document.getElementById("allTimeTotal");
     const monthPicker = document.getElementById("monthPicker");
     const yearPicker = document.getElementById("yearPicker");
+    const appError = document.getElementById("appError");
 
-    // default date today
+    // default date = today
     dateEl.value = new Date().toISOString().slice(0,10);
 
-    // show notes when Other
+    // show notes when category Other
     catEl.addEventListener("change", () => {
       if (catEl.value === "Other") {
         notesWrap.style.display = "block";
@@ -237,253 +240,216 @@
       }
     });
 
-    /* ========= Auth handlers ========= */
+    /* ================ Auth handlers ================ */
     signUpBtn.addEventListener("click", async () => {
+      authError.classList.add("hidden"); authError.textContent = "";
       const name = nameField.value.trim();
       const email = emailField.value.trim();
       const pwd = passwordField.value;
-      if (!email || !pwd) return alert("Email and password are required.");
+      if (!email || !pwd) { authError.textContent = "Email & password are required."; authError.classList.remove("hidden"); return; }
       try {
-        const userCred = await createUserWithEmailAndPassword(auth, email, pwd);
-        // set displayName if provided
+        const cred = await createUserWithEmailAndPassword(auth, email, pwd);
         if (name) {
-          await updateProfile(userCred.user, { displayName: name });
+          await updateProfile(cred.user, { displayName: name });
         }
-        // after signup, onAuthStateChanged handler will run
+        // success — onAuthStateChanged will handle UI
       } catch (err) {
-        alert(err.message);
+        authError.textContent = err.message || "Signup failed"; authError.classList.remove("hidden");
       }
     });
 
     signInBtn.addEventListener("click", async () => {
+      authError.classList.add("hidden"); authError.textContent = "";
       const email = emailField.value.trim();
       const pwd = passwordField.value;
-      if (!email || !pwd) return alert("Email and password are required.");
+      if (!email || !pwd) { authError.textContent = "Email & password are required."; authError.classList.remove("hidden"); return; }
       try {
         await signInWithEmailAndPassword(auth, email, pwd);
       } catch (err) {
-        alert(err.message);
+        authError.textContent = err.message || "Signin failed"; authError.classList.remove("hidden");
       }
     });
 
     googleBtn.addEventListener("click", async () => {
+      authError.classList.add("hidden"); authError.textContent = "";
       try {
         const provider = new GoogleAuthProvider();
         await signInWithPopup(auth, provider);
       } catch (err) {
-        alert(err.message);
+        authError.textContent = err.message || "Google sign in failed"; authError.classList.remove("hidden");
       }
     });
 
     signOutBtn.addEventListener("click", () => auth.signOut());
-    signOut.addEventListener("click", () => auth.signOut());
+    signOutTop.addEventListener("click", () => auth.signOut());
 
-    /* ========= State & data ========= */
+    /* ================ State ================ */
     let currentUser = null;
-    let unsubscribeExpenses = null; // to detach on signout
-    let allExpenses = []; // cached snapshot for the signed-in user
+    let unsubscribeExpenses = null;
+    let allExpenses = [];
 
-    /* ========= Utility helpers ========= */
-    function userExpensesCollectionRef(uid) {
-      // path: users/{uid}/expenses
-      return collection(db, "users", uid, "expenses");
-    }
+    function userExpensesRef(uid){ return collection(db, "users", uid, "expenses"); }
+    function fmt(n){ return Number(n).toLocaleString(); }
 
-    function formatAmount(v){ return Number(v).toLocaleString(); }
-
-    /* ========= Auth state watcher ========= */
+    /* ================ Auth state watcher ================ */
     onAuthStateChanged(auth, user => {
       currentUser = user;
+      authError.classList.add("hidden"); authError.textContent = "";
+      appError.classList.add("hidden"); appError.textContent = "";
+
       if (user) {
-        // show app
-        authForms.classList.add("hidden");
-        userInfo.classList.remove("hidden");
-        userEmail.textContent = user.email || user.displayName || "(no email)";
+        // show app, hide auth card
         authCard.classList.add("hidden");
         appSection.classList.remove("hidden");
+        userInfo.classList.remove("hidden");
+        userEmail.textContent = user.email || user.displayName || "";
         me.textContent = user.displayName ? `${user.displayName} (${user.email})` : user.email;
-        // start listening to this user's expenses
+        // start listening to user expenses
         startExpensesListener(user.uid);
       } else {
-        // signed out
-        currentUser = null;
-        authForms.classList.remove("hidden");
-        userInfo.classList.add("hidden");
+        // show auth card
         authCard.classList.remove("hidden");
         appSection.classList.add("hidden");
-        if (unsubscribeExpenses) {
-          unsubscribeExpenses(); unsubscribeExpenses = null;
-        }
+        userInfo.classList.add("hidden");
+        userEmail.textContent = "";
+        me.textContent = "";
+        // detach listener
+        if (unsubscribeExpenses) { unsubscribeExpenses(); unsubscribeExpenses = null; }
         allExpenses = [];
-        renderTable(); updateTotals();
+        renderFilteredData();
       }
     });
 
-    /* ========= Real-time listener for user's expenses ========= */
-    function startExpensesListener(uid) {
-      // detach previous
+    /* ================ Listen user expenses (live) ================ */
+    function startExpensesListener(uid){
       if (unsubscribeExpenses) unsubscribeExpenses();
-
-      const q = query(userExpensesCollectionRef(uid), orderBy("date","desc"));
+      const q = query(userExpensesRef(uid), orderBy("date","desc"));
       unsubscribeExpenses = onSnapshot(q, snap => {
         allExpenses = [];
-        snap.forEach(docSnap => {
-          const d = docSnap.data();
-          allExpenses.push({ id: docSnap.id, ...d });
+        snap.forEach(s => {
+          const d = s.data();
+          // ensure amount is number
+          if (typeof d.amount === "string") d.amount = parseFloat(d.amount) || 0;
+          allExpenses.push({ id: s.id, ...d });
         });
-        // populate year selector based on data
         populateYearPicker();
-        // render view based on current filter inputs
         renderFilteredData();
       }, err => {
         console.error("snapshot error", err);
+        appError.textContent = "Failed to load expenses.";
+        appError.classList.remove("hidden");
       });
     }
 
-    /* ========= Add expense (per-user) ========= */
+    /* ================ Add expense (per-user) ================ */
     addBtn.addEventListener("click", async () => {
-      if (!currentUser) return alert("Please sign in first.");
+      appError.classList.add("hidden"); appError.textContent = "";
+      if (!currentUser) { appError.textContent = "Please sign in first."; appError.classList.remove("hidden"); return; }
+
       const date = dateEl.value;
       const category = catEl.value;
       const amount = parseFloat(amtEl.value);
       const notes = (category === "Other") ? (notesEl.value || "").trim() : "";
 
       if (!date || !category || !amount || amount <= 0) {
-        return alert("Please fill all fields correctly.");
+        appError.textContent = "Please fill all fields correctly."; appError.classList.remove("hidden"); return;
       }
       if (category === "Other" && !notes) {
-        return alert('Please add a note for "Other" category.');
+        appError.textContent = 'Please add a note for "Other" category.'; appError.classList.remove("hidden"); return;
       }
 
       try {
-        await addDoc(userExpensesCollectionRef(currentUser.uid), {
+        // include uid in the doc for additional security checks if you want
+        await addDoc(userExpensesRef(currentUser.uid), {
+          uid: currentUser.uid,
           date, category, amount, notes
         });
-        // clear amount & notes (keep date & category for quick multiple adds)
-        amtEl.value = "";
-        if (category === "Other") notesEl.value = "";
+        amtEl.value = ""; if (category === "Other") notesEl.value = "";
         amtEl.focus();
       } catch (err) {
         console.error(err);
-        alert("Failed to add. Try again.");
+        appError.textContent = "Failed to add expense. Try again."; appError.classList.remove("hidden");
       }
     });
 
-    /* ========= Delete per-user ========= */
+    /* ================ Delete per-user ================ */
     tbody.addEventListener("click", async (e) => {
       const btn = e.target.closest(".btn-del");
       if (!btn) return;
       const id = btn.dataset.id;
       if (!id) return;
-      if (!currentUser) return alert("Not signed in.");
-
+      if (!currentUser) { alert("Not signed in"); return; }
       if (!confirm("Delete this expense?")) return;
       try {
-        aherep deleteDoc(doc(db, "users", currentUser.uid, "expenses", id));
-        // snapshot auto-updates
+        await deleteDoc(doc(db, "users", currentUser.uid, "expenses", id));
       } catch (err) {
         console.error(err);
-        alert("Delete failed.");
+        alert("Delete failed");
       }
     });
 
-    /* ========= Filtering & rendering ========= */
-
-    // Populate year picker from data (unique years found in allExpenses)
+    /* ================ Filtering & render ================ */
     function populateYearPicker(){
       const years = new Set();
-      allExpenses.forEach(e => {
-        if (!e.date) return;
-        const y = String(e.date).slice(0,4);
-        if (y) years.add(y);
-      });
+      allExpenses.forEach(e => { if (e.date) years.add(String(e.date).slice(0,4)); });
       const arr = Array.from(years).sort((a,b)=>b-a);
-      // preserve current selection if possible
       const cur = yearPicker.value || "all";
       yearPicker.innerHTML = '<option value="all">All years</option>';
-      arr.forEach(y => {
-        const opt = document.createElement("option");
-        opt.value = y; opt.textContent = y;
-        yearPicker.appendChild(opt);
-      });
+      arr.forEach(y => { const opt = document.createElement("option"); opt.value = y; opt.textContent = y; yearPicker.appendChild(opt); });
       yearPicker.value = arr.includes(cur) ? cur : (arr.length ? arr[0] : "all");
     }
 
-    // Render table & totals based on filters
     function renderFilteredData(){
-      const monthVal = monthPicker.value;   // "YYYY-MM" or "" (empty)
-      const yearVal = yearPicker.value;     // "all" or "YYYY"
+      const monthVal = monthPicker.value; // YYYY-MM or empty
+      const yearVal = yearPicker.value; // all or YYYY
 
-      // Filter function
       const filtered = allExpenses.filter(e => {
         if (!e.date) return false;
-        if (monthVal && monthVal !== "") {
-          return String(e.date).startsWith(monthVal); // exact month
-        }
-        if (yearVal && yearVal !== "all") {
-          return String(e.date).startsWith(yearVal);
-        }
-        return true; // all years & months
+        if (monthVal) return String(e.date).startsWith(monthVal);
+        if (yearVal && yearVal !== "all") return String(e.date).startsWith(yearVal);
+        return true;
       });
 
       // render rows
       tbody.innerHTML = "";
       filtered.forEach(e => {
-        const tr = document.createElement("tr");
         const notesText = e.notes && e.notes.trim() ? e.notes : "-";
+        const tr = document.createElement("tr");
         tr.innerHTML = `
           <td>${e.date || "-"}</td>
           <td>${e.category || "-"}</td>
-          <td>₹${formatAmount(e.amount)}</td>
+          <td>₹${fmt(e.amount)}</td>
           <td style="max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${notesText}</td>
           <td><button class="btn-del" data-id="${e.id}">Delete</button></td>
         `;
         tbody.appendChild(tr);
       });
 
-      // totals:
-      // selectedTotal = sum of filtered
       const selTotal = filtered.reduce((s,x)=>s + (Number(x.amount)||0), 0);
-      selectedTotalEl.textContent = formatAmount(selTotal);
+      selectedTotalEl.textContent = fmt(selTotal);
 
-      // all-time total (sum of allExpenses)
       const allTotal = allExpenses.reduce((s,x)=>s + (Number(x.amount)||0), 0);
-      allTimeTotalEl.textContent = formatAmount(allTotal);
+      allTimeTotalEl.textContent = fmt(allTotal);
     }
 
-    // Recompute monthlyTotal separately for the "current month" indicator if desired
-    function updateTotals(){
-      const nowPrefix = new Date().toISOString().slice(0,7); // YYYY-MM
-      const monthly = allExpenses.reduce((s,x) => {
-        return String(x.date).startsWith(nowPrefix) ? s + (Number(x.amount)||0) : s;
-      }, 0);
-      // you may display monthlyTotal somewhere if you like
-      // monthlyTotalEl.textContent = formatAmount(monthly);
-    }
-
-    // Wire up filters to re-render on change
+    // filters events
     monthPicker.addEventListener("change", () => {
-      // when month selected, ensure year picks consistent value
-      if (monthPicker.value) {
-        // set yearPicker to that year
-        yearPicker.value = monthPicker.value.slice(0,4);
-      }
+      if (monthPicker.value) yearPicker.value = monthPicker.value.slice(0,4);
       renderFilteredData();
     });
     yearPicker.addEventListener("change", () => {
-      // clear month when switching to "All years"
-      if (yearPicker.value === "all") {
-        monthPicker.value = "";
-      } else {
-        // optionally set monthPicker to empty
-        monthPicker.value = "";
-      }
+      if (yearPicker.value === "all") monthPicker.value = "";
+      else monthPicker.value = "";
       renderFilteredData();
     });
 
-    // initial blank render
+    // initial empty render
     renderFilteredData();
 
+    /* ================ Notes ================ */
+    // (already handled by catEl change listener above)
+
+    /* ================ End ================ */
   </script>
 </body>
 </html>
