@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Expense Tracker</title>
+<style>
+  :root{
+    --brand:#22c55e; /* green */
+    --brand-dark:#16a34a;
+    --bg:#f4f6f8;
+    --card:#ffffff;
+    --text:#1f2937;
+    --muted:#6b7280;
+    --danger:#ef4444;
+    --danger-dark:#dc2626;
+    --radius:12px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;background:var(--bg);color:var(--text);
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  }
+  header{
+    background:var(--brand); color:#fff; text-align:center;
+    padding:16px 14px; font-weight:700; font-size:22px;
+    box-shadow:0 2px 10px rgba(0,0,0,.08);
+  }
+  main{max-width:680px;margin:18px auto;padding:0 14px}
+  .card{
+    background:var(--card); border-radius:var(--radius);
+    box-shadow:0 6px 20px rgba(0,0,0,.08); padding:16px; margin-bottom:16px;
+  }
+
+  /* form */
+  .grid{display:grid; gap:12px}
+  label{font-size:14px; font-weight:600}
+  input[type="date"], select, input[type="number"], textarea{
+    width:100%; height:42px; padding:8px 10px; font-size:16px;
+    border:1px solid #d1d5db; border-radius:8px; background:#fff;
+  }
+  textarea{min-height:70px; height:auto; resize:vertical; padding:10px}
+  button.primary{
+    width:100%; height:44px; border:none; border-radius:10px;
+    background:var(--brand); color:#fff; font-weight:700; font-size:16px;
+    cursor:pointer; transition:.15s background;
+  }
+  button.primary:hover{background:var(--brand-dark)}
+  .row{display:flex; justify-content:space-between; align-items:center; gap:10px}
+  .monthly{font-weight:800; font-size:18px}
+
+  /* table */
+  .table-wrap{
+    width:100%; overflow-x:auto; background:var(--card);
+    border-radius:var(--radius); box-shadow:0 6px 20px rgba(0,0,0,.08);
+  }
+  table{width:100%; border-collapse:collapse; min-width:560px}
+  thead th{
+    background:var(--brand); color:#fff; font-weight:700;
+    padding:12px; text-align:left; letter-spacing:.3px;
+  }
+  tbody td{padding:12px; border-top:1px solid #eef2f7; white-space:nowrap}
+  tbody tr:nth-child(even){background:#fafafa}
+  .actions{display:flex; gap:8px}
+  .btn-del{
+    background:var(--danger); color:#fff; border:none; border-radius:8px;
+    padding:6px 10px; font-size:14px; cursor:pointer; white-space:nowrap;
+  }
+  .btn-del:hover{background:var(--danger-dark)}
+  .muted{color:var(--muted)}
+</style>
+</head>
+<body>
+<header>💰 Expense Tracker</header>
+<main>
+
+  <!-- Add Expense -->
+  <section class="card">
+    <div class="grid">
+      <div>
+        <label for="date">Date</label>
+        <input id="date" type="date" required />
+      </div>
+
+      <div>
+        <label for="category">Category</label>
+        <select id="category" required>
+          <option value="" disabled selected>Select category</option>
+          <option value="Food">Food</option>
+          <option value="Transport">Transport</option>
+          <option value="Shopping">Shopping</option>
+          <option value="Bills">Bills</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+
+      <div id="notesWrap" style="display:none">
+        <label for="notes">Notes (required for “Other”)</label>
+        <textarea id="notes" placeholder="e.g., Gift for Rahul, school fee, etc."></textarea>
+      </div>
+
+      <div>
+        <label for="amount">Amount (₹)</label>
+        <input id="amount" type="number" inputmode="decimal" min="0" step="0.01" placeholder="Enter amount" required />
+      </div>
+
+      <button id="addBtn" class="primary">+ Add Expense</button>
+    </div>
+  </section>
+
+  <!-- Monthly total -->
+  <section class="card row">
+    <div class="muted">Current month:</div>
+    <div class="monthly">₹<span id="monthlyTotal">0</span></div>
+  </section>
+
+  <!-- Table -->
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Category</th>
+          <th>Amount</th>
+          <th>Notes</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+
+</main>
+
+<!-- Firebase (ESM) -->
+<script type="module">
+  /* ---------- Firebase SDK imports ---------- */
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+  import {
+    getFirestore, collection, addDoc, deleteDoc, doc,
+    onSnapshot, query, orderBy
+  } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+  /* ---------- YOUR Firebase project config ---------- */
+  const firebaseConfig = {
+    apiKey: "AIzaSyD-0R_Sh_J8uCMV40W7qKYYFPH90gWum9U",
+    authDomain: "expense-tracker-a611b.firebaseapp.com",
+    projectId: "expense-tracker-a611b",
+    storageBucket: "expense-tracker-a611b.firebasestorage.app",
+    messagingSenderId: "481175764012",
+    appId: "1:481175764012:web:5023598f4f1852aed62589",
+    measurementId: "G-4XBWGDTX2K"
+  };
+
+  /* ---------- Init ---------- */
+  const app = initializeApp(firebaseConfig);
+  const db  = getFirestore(app);
+  const expensesRef = collection(db, "expenses");
+
+  /* ---------- UI elements ---------- */
+  const dateEl = document.getElementById("date");
+  const catEl  = document.getElementById("category");
+  const notesWrap = document.getElementById("notesWrap");
+  const notesEl = document.getElementById("notes");
+  const amtEl  = document.getElementById("amount");
+  const addBtn = document.getElementById("addBtn");
+  const tbody  = document.getElementById("tbody");
+  const monthlyTotalEl = document.getElementById("monthlyTotal");
+
+  // default date = today
+  const today = new Date().toISOString().slice(0,10);
+  dateEl.value = today;
+
+  // show/hide notes when "Other"
+  catEl.addEventListener("change", () => {
+    if (catEl.value === "Other") {
+      notesWrap.style.display = "block";
+      notesEl.setAttribute("required", "required");
+    } else {
+      notesWrap.style.display = "none";
+      notesEl.removeAttribute("required");
+      notesEl.value = "";
+    }
+  });
+
+  /* ---------- Add expense (writes to Firestore) ---------- */
+  addBtn.addEventListener("click", async () => {
+    const date = dateEl.value;
+    const category = catEl.value;
+    const amount = parseFloat(amtEl.value);
+    const notes = (category === "Other") ? (notesEl.value || "").trim() : "";
+
+    if (!date || !category || !amount || amount <= 0) {
+      alert("Please fill all fields correctly.");
+      return;
+    }
+    if (category === "Other" && !notes) {
+      alert('Please add a note for "Other" category.');
+      return;
+    }
+
+    try {
+      await addDoc(expensesRef, { date, category, amount, notes });
+      // clear inputs (keep date & category so adding multiple is quick)
+      amtEl.value = "";
+      if (category === "Other") { notesEl.value = ""; }
+      amtEl.focus();
+    } catch (e) {
+      console.error(e);
+      alert("Failed to add expense.");
+    }
+  });
+
+  /* ---------- Live read (onSnapshot) & monthly total ---------- */
+  const monthPrefix = new Date().toISOString().slice(0,7); // "YYYY-MM"
+  const q = query(expensesRef, orderBy("date","desc"));
+
+  onSnapshot(q, (snap) => {
+    tbody.innerHTML = "";
+    let monthly = 0;
+
+    snap.forEach(d => {
+      const x = d.data();
+      if (typeof x.amount === "string") x.amount = parseFloat(x.amount) || 0;
+
+      // monthly calc based on current month
+      if (String(x.date).startsWith(monthPrefix)) monthly += Number(x.amount);
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${x.date || "-"}</td>
+        <td>${x.category || "-"}</td>
+        <td>₹${Number(x.amount).toLocaleString()}</td>
+        <td>${(x.notes && x.notes.trim()) ? x.notes : "-"}</td>
+        <td class="actions">
+          <button class="btn-del" data-id="${d.id}" title="Delete">Delete</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    monthlyTotalEl.textContent = monthly.toLocaleString();
+  });
+
+  /* ---------- Delete (removes from Firestore) ---------- */
+  tbody.addEventListener("click", async (e) => {
+    const btn = e.target.closest(".btn-del");
+    if (!btn) return;
+    const id = btn.getAttribute("data-id");
+    if (!id) return;
+
+    const ok = confirm("Delete this expense?");
+    if (!ok) return;
+
+    try {
+      await deleteDoc(doc(db, "expenses", id)); // <- deletes in Firestore
+      // UI auto-updates via onSnapshot
+    } catch (err) {
+      console.error(err);
+      alert("Failed to delete. Please try again.");
+    }
+  });
+</script>
+</body>
+</html>
