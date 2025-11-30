@@ -3,268 +3,263 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Xpensive — Expense Tracker</title>
-
+  <title>Xpensive — Expense Tracker (Pro)</title>
   <style>
+    /* ========== THEME ========== */
     :root{
       --brand:#22c55e; --brand-dark:#16a34a;
       --bg:#f4f6f8; --card:#fff; --text:#111827; --muted:#6b7280;
       --input:#fff; --border:#e6e6e6; --danger:#ef4444; --radius:12px;
     }
-    /* GRAY DARK THEME (Option C: Material-like) */
     [data-theme="dark"]{
-      --bg:#121212;
-      --card:#1f1f1f;
-      --text:#e6eef8;
-      --muted:#9aa6b2;
-      --input:#151515;
-      --border:#2c2c2c;
+      --bg:#121212; --card:#1e1e1e; --text:#e6eef8; --muted:#9aa6b2;
+      --input:#151515; --border:#2c2c2c;
     }
 
     *{box-sizing:border-box}
     body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
-    header{background:var(--brand);color:#fff;padding:14px 16px;text-align:center;font-weight:700;font-size:20px;box-shadow:0 2px 10px rgba(0,0,0,.06)}
-    main{max-width:920px;margin:18px auto;padding:0 14px}
-    .card{background:var(--card);border-radius:var(--radius);padding:14px;margin-bottom:14px;box-shadow:0 6px 24px rgba(0,0,0,.06)}
+    header{background:var(--brand);color:#fff;padding:16px;text-align:center;font-weight:800;font-size:20px;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+    main{max-width:1100px;margin:18px auto;padding:0 18px}
+    .card{background:var(--card);border-radius:var(--radius);padding:18px;margin-bottom:16px;box-shadow:0 6px 24px rgba(0,0,0,.06)}
     .row{display:flex;gap:12px;align-items:center}
     .col{flex:1}
     .muted{color:var(--muted)}
     .hidden{display:none}
-    /* form / inputs unified */
+    /* inputs */
     input, select, textarea, .chip {
-      background:var(--input);
-      color:var(--text);
-      border-radius:10px;
-      padding:8px 12px;
-      border:1px solid var(--border);
-      outline: none;
-      height:42px;
-      transition: background .12s, border-color .12s, box-shadow .12s;
-      font-size:14px;
+      background:var(--input); color:var(--text); border-radius:10px; padding:10px 12px;
+      border:1px solid var(--border); outline:none; height:44px; font-size:14px;
     }
     input::placeholder, textarea::placeholder { color: rgba(0,0,0,0.35); }
     [data-theme="dark"] input::placeholder, [data-theme="dark"] textarea::placeholder { color: rgba(255,255,255,0.18); }
-    input:focus, select:focus, textarea:focus {
-      border-color: var(--brand);
-      box-shadow: 0 6px 18px rgba(34,197,94,0.06);
-    }
-    /* prevent white hover in dark mode */
-    input:hover, select:hover, textarea:hover { background: var(--input); }
-    textarea{height:80px;resize:vertical;padding:10px}
-    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}
-    .btn-row{display:flex;gap:10px}
+    input:focus, select:focus, textarea:focus { border-color: var(--brand); box-shadow:0 6px 18px rgba(34,197,94,0.06); }
+    textarea{height:90px;resize:vertical;padding:12px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
     .small{font-size:13px;color:var(--muted)}
-    /* auth */
-    #authCard input, #authCard button {width:100%;margin-top:8px;border-radius:8px;font-size:15px}
-    #authBtns{display:flex;gap:8px;margin-top:10px}
-    #authBtns button{flex:1;padding:10px;border-radius:8px;border:none;cursor:pointer}
-    button.primary{background:var(--brand);color:#fff;border:none;padding:10px;border-radius:8px;font-weight:700;cursor:pointer}
-    button.secondary{background:#f3f4f6;border:1px solid #e5e7eb;padding:10px;border-radius:8px;cursor:pointer}
-    .googleBtn{background:#fff;border:1px solid var(--border);display:flex;align-items:center;gap:10px;justify-content:center}
-    .muted-chip{background:transparent;padding:8px;border-radius:10px}
-    .chip{display:inline-block}
-    /* table */
-    .table-wrap{overflow-x:auto;border-radius:10px}
-    table{width:100%;border-collapse:collapse;min-width:720px}
-    thead th{background:var(--brand);color:#fff;padding:12px;text-align:left}
-    tbody td{padding:12px;border-top:1px solid rgba(0,0,0,0.04);vertical-align:middle;white-space:nowrap}
-    tbody tr:nth-child(even){background:rgba(0,0,0,0.02)}
-    tbody tr:hover {background:rgba(34,197,94,0.04)}
-    .btn-del{background:var(--danger);color:white;border:none;padding:7px 10px;border-radius:8px;cursor:pointer}
-    .summary{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+    button{cursor:pointer}
+    .btn {padding:10px 14px;border-radius:8px;border:none}
+    .primary{background:var(--brand);color:#fff;font-weight:700}
+    .secondary{background:#f3f4f6;border:1px solid var(--border);color:var(--text)}
+    .danger{background:var(--danger);color:#fff}
+    .googleBtn{display:flex;gap:10px;align-items:center;justify-content:center;background:var(--input);border:1px solid var(--border)}
+    /* summary */
+    .summary{display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+    .muted-chip{background:transparent;padding:10px;border-radius:10px}
     .big{font-weight:800;font-size:18px}
     .right{text-align:right}
-    .error{color:var(--danger);font-size:14px;margin-top:8px}
-    .progress{height:10px;border-radius:999px;background:#f3f4f6;overflow:hidden}
-    .progress > i{display:block;height:100%;background:linear-gradient(90deg,var(--brand),var(--brand-dark));}
-    .top-controls{display:flex;gap:10px;align-items:center}
-    .search{padding:8px 10px;border-radius:8px;border:1px solid var(--border);min-width:200px}
-    .settings-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-    .warn { color: var(--danger); font-weight:700; margin-top:8px; }
-    @media (max-width:520px){ .grid{grid-template-columns:1fr} table{min-width:560px} .summary{flex-direction:column;align-items:flex-start} }
+    /* table */
+    .table-wrap{overflow-x:auto;border-radius:10px}
+    table{width:100%;border-collapse:collapse;min-width:840px}
+    thead th{background:var(--brand);color:#fff;padding:12px;text-align:left}
+    tbody td{padding:12px;border-top:1px solid rgba(0,0,0,0.06);vertical-align:middle;white-space:nowrap}
+    tbody tr:nth-child(even){background:rgba(0,0,0,0.02)}
+    .btn-del{background:var(--danger);color:white;border:none;padding:7px 10px;border-radius:8px}
+    /* small helpers */
+    .chip-inline{display:inline-block;padding:8px 10px;border-radius:999px;border:1px solid var(--border)}
+    .warn{color:var(--danger);font-weight:700}
+    .ok{color:var(--brand);font-weight:700}
+    @media (max-width:820px){ .grid{grid-template-columns:repeat(auto-fit,minmax(160px,1fr))} table{min-width:600px} }
   </style>
 </head>
 <body>
-  <header>💰 Xpensive — Expense Tracker</header>
+  <header>💰 Xpensive — Expense Tracker (Pro)</header>
   <main>
-    <!-- AUTH Card -->
-<section id="authCard" class="card">
-  <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
-    <div>
-      <div style="font-size:18px;font-weight:700">Sign in or Create account</div>
-      <div class="small muted">Use Email/Password or Google to keep your expenses private and synced.</div>
-    </div>
-    <div id="userInfo" class="hidden" style="text-align:right">
-      <div class="small muted">Signed in as</div>
-      <div id="userEmail" style="font-weight:700"></div>
-      <div style="margin-top:8px"><button id="signOut" class="secondary">Sign out</button></div>
-    </div>
-  </div>
 
-  <div id="authForms" style="margin-top:12px;max-width:540px">
-    <input id="nameField" type="text" placeholder="Full name (for signup)" />
-    <input id="emailField" type="email" placeholder="Email" />
-    <input id="passwordField" type="password" placeholder="Password (min 6 chars)" />
-    <div id="authBtns">
-      <button id="signInBtn" class="secondary">Sign in</button>
-      <button id="signUpBtn" class="primary">Create account</button>
-    </div>
-    <div style="margin-top:8px;display:flex;gap:8px">
-      <button id="googleBtn" class="googleBtn">Continue with Google</button>
-      <button id="demoBtn" class="secondary">Demo (no auth)</button>
-    </div>
-    <div id="authError" class="error hidden"></div>
-  </div>
-</section>
-
-<!-- APP -->
-<section id="app" class="hidden">
-  <div class="card summary">
-    <div style="display:flex;gap:10px;align-items:center;">
-      <div>
-        <div class="small muted">Logged in as</div>
-        <div id="me" style="font-weight:800"></div>
-      </div>
-      <div class="chip"><button id="signOutBtn" class="secondary">Sign out</button></div>
-    </div>
-
-    <div class="top-controls" style="flex:1;justify-content:center">
-      <div class="muted-chip" style="padding:10px;border-radius:10px">
-        <div class="small-muted">Wallet</div>
-        <div id="walletAmount" class="big">₹0</div>
-      </div>
-
-      <div class="muted-chip" style="padding:10px;border-radius:10px">
-        <div class="small-muted">Spent (sel)</div>
-        <div id="spentAmount" class="big">₹0</div>
-      </div>
-
-      <div class="muted-chip" style="padding:10px;border-radius:10px">
-        <div class="small-muted">Remaining Wallet</div>
-        <div id="remainingAmount" class="big">₹0</div>
-      </div>
-
-      <div style="display:flex;flex-direction:column;align-items:flex-start;gap:6px">
-        <div class="small muted">Month</div>
-        <input id="monthPicker" type="month" />
-      </div>
-
-      <div style="display:flex;flex-direction:column;align-items:flex-start;gap:6px">
-        <div class="small muted">Export</div>
-        <div class="settings-row">
-          <select id="exportMode" class="chip">
-            <option value="month">Selected month</option>
-            <option value="range">Date range</option>
-            <option value="all">All time</option>
-          </select>
-          <input id="exportFrom" type="date" class="chip" style="display:none" />
-          <input id="exportTo" type="date" class="chip" style="display:none" />
-          <button id="exportBtn" class="secondary">Export CSV</button>
-          <button id="printReport" class="secondary">Print Report</button>
+    <!-- AUTH CARD -->
+    <section id="authCard" class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+        <div>
+          <div style="font-size:18px;font-weight:700">Sign in or Create account</div>
+          <div class="small muted">Use Email/Password or Google to keep your data synced across devices.</div>
         </div>
-      </div>
-    </div>
-
-    <div style="display:flex;gap:10px;align-items:center;">
-      <input id="searchBox" class="search" placeholder="Search notes, category, amount or date" />
-      <div class="chip settings-panel" style="display:flex;align-items:center;gap:10px">
-        <label class="small-muted" for="darkToggle">Dark</label>
-        <input id="darkToggle" type="checkbox" />
-        <button id="editSettings" class="secondary">Edit Wallet / Budgets</button>
-      </div>
-    </div>
-    <div id="budgetWarn" class="warn hidden"></div>
-  </div>
-
-  <!-- settings editor -->
-  <section id="settingsCard" class="card hidden">
-    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
-      <div style="min-width:180px">
-        <label>Wallet Balance (₹)</label>
-        <input id="walletInput" type="number" step="0.01" />
-      </div>
-      <div style="min-width:180px">
-        <label>Monthly Budget (₹)</label>
-        <input id="monthlyBudgetInput" type="number" step="0.01" />
-      </div>
-
-      <div style="flex:1;min-width:200px">
-        <label>Category Budgets (₹)</label>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <input id="bFood" placeholder="Food" type="number" class="chip" />
-          <input id="bTransport" placeholder="Transport" type="number" class="chip" />
-          <input id="bShopping" placeholder="Shopping" type="number" class="chip" />
-          <input id="bBills" placeholder="Bills" type="number" class="chip" />
-          <input id="bOther" placeholder="Other" type="number" class="chip" />
+        <div id="userInfo" class="hidden" style="text-align:right">
+          <div class="small muted">Signed in as</div>
+          <div id="userEmail" style="font-weight:800"></div>
+          <div style="margin-top:10px"><button id="signOut" class="btn secondary">Sign out</button></div>
         </div>
       </div>
 
-      <div style="display:flex;gap:8px">
-        <button id="saveSettings" class="primary">Save</button>
-        <button id="cancelSettings" class="secondary">Cancel</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- add expense -->
-  <section class="card">
-    <div class="grid">
-      <div>
-        <label for="date">Date</label>
-        <input id="date" type="date" />
-      </div>
-      <div>
-        <label for="category">Category</label>
-        <select id="category">
-          <option value="" disabled selected>Select category</option>
-          <option value="Food">Food</option>
-          <option value="Transport">Transport</option>
-          <option value="Shopping">Shopping</option>
-          <option value="Bills">Bills</option>
-          <option value="Other">Other</option>
-        </select>
-      </div>
-
-      <div id="notesWrap" style="display:none">
-        <label for="notes">Notes (required for "Other")</label>
-        <textarea id="notes" placeholder="Describe the expense..."></textarea>
-      </div>
-
-      <div>
-        <label for="amount">Amount (₹)</label>
-        <input id="amount" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00" />
-      </div>
-
-      <div style="grid-column:1 / -1">
-        <div class="row" style="align-items:center;justify-content:space-between">
-          <div class="small muted">Selected view total</div>
-          <div class="big right">₹<span id="selectedTotal">0</span></div>
+      <div id="authForms" style="margin-top:12px;max-width:680px">
+        <input id="nameField" type="text" placeholder="Full name (for signup)" />
+        <input id="emailField" type="email" placeholder="Email" />
+        <input id="passwordField" type="password" placeholder="Password (min 6 chars)" />
+        <div style="display:flex;gap:10px;margin-top:10px">
+          <button id="signInBtn" class="btn secondary" style="flex:1">Sign in</button>
+          <button id="signUpBtn" class="btn primary" style="flex:1">Create account</button>
         </div>
-        <div style="margin-top:10px">
-          <button id="addBtn" class="primary">+ Add Expense</button>
+
+        <div style="display:flex;gap:10px;margin-top:12px">
+          <button id="googleBtn" class="btn googleBtn" style="flex:1">Continue with Google</button>
+          <button id="demoBtn" class="btn secondary" style="flex:1">Demo (no auth)</button>
         </div>
-        <div id="appError" class="error hidden"></div>
+        <div id="authError" class="warn" style="margin-top:8px;display:none"></div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- table -->
-  <section class="card">
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr><th>Date</th><th>Category</th><th>Amount</th><th>Notes</th><th>Action</th></tr>
-        </thead>
-        <tbody id="tbody"></tbody>
-      </table>
-    </div>
-  </section>
-</section>
+    <!-- APP -->
+    <section id="app" class="hidden">
+      <div class="card">
+        <div class="summary">
+          <div style="display:flex;gap:12px;align-items:center">
+            <div>
+              <div class="small muted">Logged in as</div>
+              <div id="me" style="font-weight:800"></div>
+            </div>
+            <div><button id="signOutBtn" class="btn secondary">Sign out</button></div>
+          </div>
 
+          <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+            <div class="muted-chip" style="padding:10px;border-radius:10px">
+              <div class="small-muted">Wallet</div>
+              <div id="walletAmount" class="big">₹0</div>
+            </div>
+
+            <div class="muted-chip" style="padding:10px;border-radius:10px">
+              <div class="small-muted">Spent (sel)</div>
+              <div id="spentAmount" class="big">₹0</div>
+            </div>
+
+            <div class="muted-chip" style="padding:10px;border-radius:10px">
+              <div class="small-muted">Remaining</div>
+              <div id="remainingAmount" class="big">₹0</div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <div class="small muted">View</div>
+              <select id="viewMode" class="chip">
+                <option value="month">Selected month</option>
+                <option value="all">All time</option>
+              </select>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <div class="small muted">Month</div>
+              <input id="monthPicker" type="month" />
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <div class="small muted">Export</div>
+              <div style="display:flex;gap:8px;align-items:center">
+                <select id="exportMode" class="chip">
+                  <option value="month">Selected month</option>
+                  <option value="range">Date range</option>
+                  <option value="all">All time</option>
+                </select>
+                <input id="exportFrom" type="date" style="display:none" />
+                <input id="exportTo" type="date" style="display:none" />
+                <button id="exportBtn" class="btn secondary">Export CSV</button>
+                <button id="printReport" class="btn secondary">Print</button>
+              </div>
+            </div>
+
+            <div style="display:flex;align-items:center;gap:10px">
+              <input id="searchBox" class="chip" placeholder="Search notes, category, amount, date" style="min-width:220px" />
+            </div>
+          </div>
+        </div>
+
+        <div id="budgetWarn" class="warn" style="margin-top:12px;display:none"></div>
+      </div>
+
+      <!-- settings editor -->
+      <section id="settingsCard" class="card">
+        <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+          <div style="min-width:200px">
+            <label>Default monthly income (auto top-up)</label>
+            <input id="monthlyIncome" type="number" placeholder="e.g. 4000" />
+          </div>
+
+          <div style="min-width:200px">
+            <label>Monthly top-up type</label>
+            <select id="monthlyTopUpType" class="chip">
+              <option value="reset">Reset to monthly income</option>
+              <option value="topup">Add monthly income to leftover</option>
+            </select>
+          </div>
+
+          <div style="min-width:200px">
+            <label>Monthly Budget (₹)</label>
+            <input id="monthlyBudgetInput" type="number" placeholder="e.g. 3000" />
+          </div>
+
+          <div style="flex:1;min-width:260px">
+            <label>Category budgets</label>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">
+              <input id="bFood" placeholder="Food" type="number" class="chip" />
+              <input id="bTransport" placeholder="Transport" type="number" class="chip" />
+              <input id="bShopping" placeholder="Shopping" type="number" class="chip" />
+              <input id="bBills" placeholder="Bills" type="number" class="chip" />
+              <input id="bOther" placeholder="Other" type="number" class="chip" />
+            </div>
+          </div>
+
+          <div style="display:flex;gap:8px;align-items:center">
+            <button id="saveSettings" class="btn primary">Save settings</button>
+            <button id="recreateMonthWallet" class="btn secondary">Set wallet for month</button>
+            <button id="deleteWalletMonth" class="btn secondary">Delete month wallet</button>
+          </div>
+        </div>
+
+        <div style="margin-top:12px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+          <label class="small muted" style="margin-right:6px">Dark mode</label>
+          <input id="darkToggle" type="checkbox" />
+          <div class="small muted" style="margin-left:16px">(saved per account)</div>
+        </div>
+
+      </section>
+
+      <!-- add expense -->
+      <section class="card">
+        <div class="grid">
+          <div>
+            <label>Date</label>
+            <input id="date" type="date" />
+          </div>
+          <div>
+            <label>Category</label>
+            <select id="category">
+              <option value="" disabled selected>Select category</option>
+              <option value="Food">Food</option>
+              <option value="Transport">Transport</option>
+              <option value="Shopping">Shopping</option>
+              <option value="Bills">Bills</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div>
+            <label>Amount (₹)</label>
+            <input id="amount" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00" />
+          </div>
+
+          <div style="grid-column:1 / -1">
+            <label>Notes</label>
+            <textarea id="notes" placeholder="Describe the expense (required for Other)"></textarea>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
+              <div class="small muted">Selected view total: ₹<span id="selectedTotal">0</span></div>
+              <div><button id="addBtn" class="btn primary">+ Add Expense</button></div>
+            </div>
+            <div id="appError" class="warn" style="display:none;margin-top:8px"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- table -->
+      <section class="card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Date</th><th>Category</th><th>Amount</th><th>Notes</th><th>Action</th></tr></thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+      </section>
+
+    </section>
   </main>
 
-  <!-- Firebase (ESM v12) -->
+  <!-- Firebase & App Script -->
   <script type="module">
+    /* ========= FIREBASE IMPORTS ========= */
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
     import {
       getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut,
@@ -272,10 +267,10 @@
     } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
     import {
       getFirestore, collection, addDoc, deleteDoc, doc,
-      onSnapshot, query, orderBy, getDoc, setDoc, updateDoc
+      onSnapshot, query, orderBy, getDoc, setDoc, updateDoc, getDocs
     } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
-    /* ================ config (your project) ================ */
+    /* ======= YOUR FIREBASE CONFIG (leave unchanged) ======= */
     const firebaseConfig = {
       apiKey: "AIzaSyD-0R_Sh_J8uCMV40W7qKYYFPH90gWum9U",
       authDomain: "expense-tracker-a611b.firebaseapp.com",
@@ -285,11 +280,13 @@
       appId: "1:481175764012:web:5023598f4f1852aed62589",
       measurementId: "G-4XBWGDTX2K"
     };
+
+    /* ======== INIT ======== */
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    /* UI refs */
+    /* ======== UI REFS ======== */
     const authCard = document.getElementById("authCard");
     const authError = document.getElementById("authError");
     const userEmail = document.getElementById("userEmail");
@@ -308,7 +305,6 @@
     const me = document.getElementById("me");
     const dateEl = document.getElementById("date");
     const catEl = document.getElementById("category");
-    const notesWrap = document.getElementById("notesWrap");
     const notesEl = document.getElementById("notes");
     const amtEl = document.getElementById("amount");
     const addBtn = document.getElementById("addBtn");
@@ -318,12 +314,9 @@
     const appError = document.getElementById("appError");
     const searchBox = document.getElementById("searchBox");
 
-    const walletAmountEl = document.getElementById("walletAmount");
-    const spentAmountEl = document.getElementById("spentAmount");
-    const remainingAmountEl = document.getElementById("remainingAmount");
-    const editSettingsBtn = document.getElementById("editSettings");
-    const settingsCard = document.getElementById("settingsCard");
-    const walletInput = document.getElementById("walletInput");
+    // settings refs
+    const monthlyIncomeEl = document.getElementById("monthlyIncome");
+    const monthlyTopUpTypeEl = document.getElementById("monthlyTopUpType");
     const monthlyBudgetInput = document.getElementById("monthlyBudgetInput");
     const bFood = document.getElementById("bFood");
     const bTransport = document.getElementById("bTransport");
@@ -331,106 +324,37 @@
     const bBills = document.getElementById("bBills");
     const bOther = document.getElementById("bOther");
     const saveSettings = document.getElementById("saveSettings");
-    const cancelSettings = document.getElementById("cancelSettings");
+    const recreateMonthWallet = document.getElementById("recreateMonthWallet");
+    const deleteWalletMonth = document.getElementById("deleteWalletMonth");
     const darkToggle = document.getElementById("darkToggle");
     const budgetWarn = document.getElementById("budgetWarn");
+    const viewMode = document.getElementById("viewMode");
 
+    // export refs
     const exportMode = document.getElementById("exportMode");
     const exportFrom = document.getElementById("exportFrom");
     const exportTo = document.getElementById("exportTo");
     const exportBtn = document.getElementById("exportBtn");
     const printReport = document.getElementById("printReport");
 
+    // default date
     dateEl.value = new Date().toISOString().slice(0,10);
 
-    catEl.addEventListener("change", () => {
-      if (catEl.value === "Other") {
-        notesWrap.style.display = "block";
-        notesEl.setAttribute("required","required");
-      } else {
-        notesWrap.style.display = "none";
-        notesEl.removeAttribute("required");
-        notesEl.value = "";
-      }
-    });
-
-    function friendlyAuthError(err){
-      const code = (err && err.code) ? String(err.code) : (err && err.message ? String(err.message) : '');
-      const m = String(code).match(/auth\/(.+)$/);
-      const key = m ? m[1] : code;
-      const map = {
-        'email-already-in-use': 'That email is already registered. Try signing in or use another email.',
-        'invalid-email': 'This email address looks invalid.',
-        'user-not-found': 'No account found with that email.',
-        'wrong-password': 'Incorrect password. Please try again.',
-        'weak-password': 'Password should be at least 6 characters.',
-        'popup-closed-by-user': 'Sign-in popup was closed. Try again.',
-        'popup-blocked': 'Popup blocked by browser. Allow popups and try again.'
-      };
-      if (map[key]) return map[key];
-      return (err && err.message) ? String(err.message).replace(/^Firebase:\s*/i, '') : 'An unexpected error occurred.';
+    /* ========= HELPER UTILS ========= */
+    function fmt(n){ return Number(n).toLocaleString(); }
+    function monthKeyFromDate(dStr){ // 'YYYY-MM-DD' or 'YYYY-MM' => 'YYYY-MM'
+      if (!dStr) return '';
+      return (dStr.length >= 7) ? dStr.slice(0,7) : dStr;
     }
+    function todayMonth(){ return new Date().toISOString().slice(0,7); }
 
-    /* ================ Auth handlers ================ */
-    signUpBtn.addEventListener("click", async () => {
-      authError.classList.add("hidden"); authError.textContent = "";
-      const name = nameField.value.trim();
-      const email = emailField.value.trim();
-      const pwd = passwordField.value;
-      if (!email || !pwd) { authError.textContent = "Email & password are required."; authError.classList.remove("hidden"); return; }
-      try {
-        const cred = await createUserWithEmailAndPassword(auth, email, pwd);
-        if (name) {
-          await updateProfile(cred.user, { displayName: name });
-        }
-      } catch (err) {
-        authError.textContent = friendlyAuthError(err); authError.classList.remove("hidden");
-      }
-    });
-
-    signInBtn.addEventListener("click", async () => {
-      authError.classList.add("hidden"); authError.textContent = "";
-      const email = emailField.value.trim();
-      const pwd = passwordField.value;
-      if (!email || !pwd) { authError.textContent = "Email & password are required."; authError.classList.remove("hidden"); return; }
-      try {
-        await signInWithEmailAndPassword(auth, email, pwd);
-      } catch (err) {
-        authError.textContent = friendlyAuthError(err); authError.classList.remove("hidden");
-      }
-    });
-
-    googleBtn.addEventListener("click", async () => {
-      authError.classList.add("hidden"); authError.textContent = "";
-      const provider = new GoogleAuthProvider();
-      try {
-        await signInWithPopup(auth, provider);
-      } catch (err) {
-        authError.textContent = friendlyAuthError(err); authError.classList.remove("hidden");
-      }
-    });
-
-    demoBtn.addEventListener("click", () => {
-      alert("Demo mode: no cloud sync. Sign in to use cloud features.");
-      authCard.classList.add("hidden");
-      appSection.classList.remove("hidden");
-      me.textContent = "Demo (local only)";
-    });
-
-    signOutBtn.addEventListener("click", () => auth.signOut());
-    signOutTop.addEventListener("click", () => auth.signOut());
-
-    /* ================ State ================ */
-    let currentUser = null;
-    let unsubscribeExpenses = null;
-    let unsubscribeSettings = null;
-    let allExpenses = [];
-    let settings = null;
-
+    /* ========= FIRESTORE PATH HELPERS ========= */
     function userExpensesRef(uid){ return collection(db, "users", uid, "expenses"); }
     function userSettingsDoc(uid){ return doc(db, "users", uid, "settings", "prefs"); }
-    function fmt(n){ return Number(n).toLocaleString(); }
+    function userWalletHistoryRef(uid){ return collection(db, "users", uid, "walletHistory"); }
+    function userWalletMonthDoc(uid, monthKey){ return doc(db, "users", uid, "walletHistory", monthKey); }
 
+    /* ========= NORMALIZE EXPENSE ======== */
     function normalizeExpenseData(d){
       const out = Object.assign({}, d);
       if (typeof out.amount === 'string') out.amount = parseFloat(out.amount) || 0;
@@ -448,72 +372,138 @@
       return out;
     }
 
-    /* ================ Auth state watcher ================ */
+    /* ========= FRIENDLY ERRORS ========= */
+    function friendlyAuthError(err){
+      const code = (err && err.code) ? String(err.code) : (err && err.message ? String(err.message) : '');
+      const m = String(code).match(/auth\/(.+)$/);
+      const key = m ? m[1] : code;
+      const map = {
+        'email-already-in-use': 'That email is already registered. Try signing in or use another email.',
+        'invalid-email': 'This email address looks invalid.',
+        'user-not-found': 'No account found with that email.',
+        'wrong-password': 'Incorrect password. Please try again.',
+        'weak-password': 'Password should be at least 6 characters.',
+        'popup-closed-by-user': 'Sign-in popup was closed. Try again.',
+        'popup-blocked': 'Popup blocked by browser. Allow popups and try again.',
+        'auth/unauthorized-domain': 'This domain is not authorized for Google sign-in. Add it in Firebase Console.'
+      };
+      if (map[key]) return map[key];
+      return (err && err.message) ? String(err.message).replace(/^Firebase:\s*/i, '') : 'An unexpected error occurred.';
+    }
+
+    /* ========= AUTH HANDLERS ========= */
+    signUpBtn.addEventListener("click", async () => {
+      authError.style.display='none'; authError.textContent='';
+      const name = nameField.value.trim(); const email = emailField.value.trim(); const pwd = passwordField.value;
+      if (!email || !pwd) { authError.style.display='block'; authError.textContent='Email & password required.'; return; }
+      try {
+        const cred = await createUserWithEmailAndPassword(auth, email, pwd);
+        if (name) await updateProfile(cred.user, { displayName: name });
+      } catch (err) { authError.style.display='block'; authError.textContent = friendlyAuthError(err); }
+    });
+
+    signInBtn.addEventListener("click", async () => {
+      authError.style.display='none'; authError.textContent='';
+      const email = emailField.value.trim(); const pwd = passwordField.value;
+      if (!email || !pwd) { authError.style.display='block'; authError.textContent='Email & password required.'; return; }
+      try { await signInWithEmailAndPassword(auth, email, pwd); }
+      catch (err) { authError.style.display='block'; authError.textContent = friendlyAuthError(err); }
+    });
+
+    googleBtn.addEventListener("click", async () => {
+      authError.style.display='none'; authError.textContent='';
+      const provider = new GoogleAuthProvider();
+      try { await signInWithPopup(auth, provider); }
+      catch (err) { authError.style.display='block'; authError.textContent = friendlyAuthError(err); }
+    });
+
+    demoBtn.addEventListener("click", () => {
+      alert("Demo mode: no cloud sync. Sign in to use cloud features.");
+      authCard.classList.add("hidden"); appSection.classList.remove("hidden"); me.textContent = "Demo (local only)";
+    });
+
+    signOutBtn.addEventListener("click", () => auth.signOut());
+    signOutTop.addEventListener("click", () => auth.signOut());
+
+    /* ========= APP STATE ========= */
+    let currentUser = null;
+    let unsubscribeExpenses = null;
+    let unsubscribeSettings = null;
+    let unsubscribeWalletHistory = null;
+    let allExpenses = []; // array of expense objects
+    let walletHistory = []; // array of {month: 'YYYY-MM', wallet: number}
+    let settings = null;
+
+    /* ========= LISTENERS ========= */
     onAuthStateChanged(auth, user => {
       currentUser = user;
-      authError.classList.add("hidden"); authError.textContent = "";
-      appError.classList.add("hidden"); appError.textContent = "";
+      authError.style.display='none'; authError.textContent='';
+      appError.style.display='none'; appError.textContent='';
 
       if (user) {
-        authCard.classList.add("hidden");
-        appSection.classList.remove("hidden");
+        authCard.classList.add("hidden"); appSection.classList.remove("hidden");
         userEmail.textContent = user.email || user.displayName || "";
         me.textContent = user.displayName ? `${user.displayName} (${user.email})` : user.email;
         startExpensesListener(user.uid);
         startSettingsListener(user.uid);
+        startWalletHistoryListener(user.uid);
       } else {
-        authCard.classList.remove("hidden");
-        appSection.classList.add("hidden");
-        userEmail.textContent = "";
-        me.textContent = "";
+        authCard.classList.remove("hidden"); appSection.classList.add("hidden");
+        userEmail.textContent = ""; me.textContent = "";
         if (unsubscribeExpenses) { unsubscribeExpenses(); unsubscribeExpenses = null; }
         if (unsubscribeSettings) { unsubscribeSettings(); unsubscribeSettings = null; }
-        allExpenses = [];
-        settings = null;
+        if (unsubscribeWalletHistory) { unsubscribeWalletHistory(); unsubscribeWalletHistory = null; }
+        allExpenses = []; walletHistory = []; settings = null;
         renderFilteredData();
       }
     });
 
-    /* ================ Expenses listener ================ */
+    /* ========= EXPENSES (LIVE) ========= */
     function startExpensesListener(uid){
       if (unsubscribeExpenses) unsubscribeExpenses();
       const q = query(userExpensesRef(uid), orderBy("date","desc"));
       unsubscribeExpenses = onSnapshot(q, snap => {
         allExpenses = [];
-        snap.forEach(s => {
-          const d = s.data();
-          const norm = normalizeExpenseData(d);
-          allExpenses.push({ id: s.id, ...norm });
-        });
+        snap.forEach(s => { const d = s.data(); const norm = normalizeExpenseData(d); allExpenses.push({ id: s.id, ...norm }); });
         renderFilteredData();
-      }, err => {
-        console.error("snapshot error", err);
-        appError.textContent = "Failed to load expenses.";
-        appError.classList.remove("hidden");
-      });
+      }, err => { console.error("snapshot error", err); appError.style.display='block'; appError.textContent='Failed to load expenses.'; });
     }
 
-    /* ================ Settings doc (ensure + listener) ================ */
+    /* ========= WALLET HISTORY (LIVE) ========= */
+    function startWalletHistoryListener(uid){
+      if (unsubscribeWalletHistory) unsubscribeWalletHistory();
+      const ref = userWalletHistoryRef(uid);
+      unsubscribeWalletHistory = onSnapshot(ref, snap => {
+        walletHistory = [];
+        snap.forEach(s => {
+          const m = s.id; // 'YYYY-MM'
+          const data = s.data();
+          walletHistory.push({ month: m, wallet: Number(data.wallet || 0), ts: data.timestamp || null, note: data.note || '' });
+        });
+        // keep sorted ascending by month (older -> newer)
+        walletHistory.sort((a,b) => a.month.localeCompare(b.month));
+        renderFilteredData();
+      }, err => console.error("walletHistory snapshot error", err));
+    }
+
+    /* ========= SETTINGS (SINGLE DOC) ========= */
     async function ensureSettingsDoc(uid){
       const sref = userSettingsDoc(uid);
       try {
         const snap = await getDoc(sref);
         if (!snap.exists()) {
           const defaults = {
-            walletBalance: 0,
+            monthlyIncome: 0,
+            monthlyTopUpType: "reset",
             monthlyBudget: 0,
             darkMode: false,
-            categoryBudgets: { Food:0, Transport:0, Shopping:0, Bills:0, Other:0 }
+            categoryBudgets: { Food:0, Transport:0, Shopping:0, Bills:0, Other:0 },
+            lastTopUpMonth: "" // used for automatic top-ups
           };
           await setDoc(sref, defaults);
           return defaults;
-        } else {
-          return snap.data();
-        }
-      } catch (e) {
-        console.error("ensureSettingsDoc error", e);
-        return null;
-      }
+        } else return snap.data();
+      } catch (e){ console.error("ensureSettingsDoc error", e); return null; }
     }
 
     function startSettingsListener(uid){
@@ -523,21 +513,19 @@
         unsubscribeSettings = onSnapshot(sref, snap => {
           settings = snap.exists() ? snap.data() : null;
           applySettingsToUI();
-          renderFilteredData();
+          // after settings loaded, ensure monthly wallet exists and possibly top-up
+          runMonthlyTopUpIfNeeded(uid).then(()=>renderFilteredData());
         }, err => console.error("settings snapshot error", err));
       });
     }
 
     function applySettingsToUI(){
       if (!settings) {
-        walletAmountEl.textContent = `₹0`; walletInput.value = ""; monthlyBudgetInput.value = "";
-        bFood.value = ""; bTransport.value = ""; bShopping.value = ""; bBills.value = ""; bOther.value = "";
-        darkToggle.checked = false; document.documentElement.removeAttribute("data-theme");
-        return;
+        monthlyIncomeEl.value = ""; monthlyBudgetInput.value = ""; bFood.value = ""; bTransport.value = ""; bShopping.value = ""; bBills.value = ""; bOther.value = "";
+        darkToggle.checked = false; document.documentElement.removeAttribute("data-theme"); return;
       }
-      const w = Number(settings.walletBalance || 0);
-      walletAmountEl.textContent = `₹${fmt(w)}`;
-      walletInput.value = settings.walletBalance || "";
+      monthlyIncomeEl.value = settings.monthlyIncome || "";
+      monthlyTopUpTypeEl.value = settings.monthlyTopUpType || "reset";
       monthlyBudgetInput.value = settings.monthlyBudget || "";
       const cb = settings.categoryBudgets || {};
       bFood.value = cb.Food || ""; bTransport.value = cb.Transport || ""; bShopping.value = cb.Shopping || ""; bBills.value = cb.Bills || ""; bOther.value = cb.Other || "";
@@ -545,48 +533,125 @@
       if (settings.darkMode) document.documentElement.setAttribute("data-theme","dark"); else document.documentElement.removeAttribute("data-theme");
     }
 
-    /* ================ Add Expense ================ */
-    addBtn.addEventListener("click", async () => {
-      appError.classList.add("hidden"); appError.textContent = "";
-      if (!currentUser) { appError.textContent = "Please sign in first."; appError.classList.remove("hidden"); return; }
+    /* ========= AUTOMATIC MONTHLY TOP-UP / WALLET CREATION =========
+       Behavior:
+       - If there is no walletHistory doc for this month, create it automatically.
+       - If monthlyTopUpType === 'reset' => set wallet = monthlyIncome
+       - If monthlyTopUpType === 'topup' => set wallet = previousMonthLeftover + monthlyIncome (if previous exists)
+       - Use settings.lastTopUpMonth guard to avoid duplicate top-ups.
+    */
+    async function runMonthlyTopUpIfNeeded(uid){
+      if (!settings) return;
+      const nowMonth = todayMonth(); // 'YYYY-MM'
+      const last = settings.lastTopUpMonth || "";
+      const monthlyIncome = Number(settings.monthlyIncome || 0);
+      const topUpType = settings.monthlyTopUpType || "reset";
 
-      const date = dateEl.value; const category = catEl.value;
-      const amount = parseFloat(amtEl.value); const notes = (category==="Other") ? (notesEl.value||"").trim() : "";
-
-      if (!date || !category || !amount || amount <= 0) { appError.textContent = "Please fill all fields correctly."; appError.classList.remove("hidden"); return; }
-      if (category === "Other" && !notes) { appError.textContent = 'Please add a note for "Other" category.'; appError.classList.remove("hidden"); return; }
-      if (addBtn.disabled) return;
-
+      // ensure wallet doc exists for current month
+      const currentDocRef = userWalletMonthDoc(uid, nowMonth);
       try {
-        addBtn.disabled = true; addBtn.textContent = 'Adding...';
-        await addDoc(userExpensesRef(currentUser.uid), {
-          uid: currentUser.uid, date: date, category, amount: Number(amount), notes
-        });
-        catEl.value = ""; amtEl.value = ""; notesEl.value = ""; notesWrap.style.display = "none"; amtEl.focus();
+        const snap = await getDoc(currentDocRef);
+        if (snap.exists()) {
+          // already exists: but maybe top-up type changed and lastTopUpMonth not set
+          if (last !== nowMonth && monthlyIncome > 0) {
+            // apply top-up if user requested and month doc exists but top-up not recorded
+            await updateDoc(userSettingsDoc(uid), { lastTopUpMonth: nowMonth });
+          }
+          return;
+        }
+        // no doc exists -> create according to settings
+        let walletToSet = 0;
+        if (topUpType === "reset") {
+          walletToSet = monthlyIncome;
+        } else { // 'topup' -> try derive leftover from previous month
+          // find previous month in walletHistory
+          const idx = walletHistory.findIndex(w => w.month === nowMonth);
+          // if walletHistory has previous month, compute leftover = previous.wallet - previousMonthSpent
+          // find max previous month < nowMonth
+          let prev = null;
+          for (let i = walletHistory.length - 1; i >= 0; --i) {
+            if (walletHistory[i].month < nowMonth) { prev = walletHistory[i]; break; }
+          }
+          if (prev) {
+            // compute prev month spent
+            const prevSpent = allExpenses.filter(e => monthKeyFromDate(e.date) === prev.month).reduce((s,x)=>s+(Number(x.amount)||0),0);
+            const leftover = (Number(prev.wallet)||0) - prevSpent;
+            walletToSet = leftover + monthlyIncome;
+          } else {
+            walletToSet = monthlyIncome;
+          }
+        }
+        // create doc
+        await setDoc(currentDocRef, { wallet: Number(walletToSet||0), timestamp: new Date().toISOString(), note: 'Auto-created monthly wallet' });
+        // record lastTopUpMonth
+        await updateDoc(userSettingsDoc(uid), { lastTopUpMonth: nowMonth });
       } catch (err) {
-        console.error(err); appError.textContent = "Failed to add expense. Try again."; appError.classList.remove("hidden");
-      } finally { addBtn.disabled = false; addBtn.textContent = '+ Add Expense'; }
+        console.error('monthly top-up failed', err);
+      }
+    }
+
+    /* ========= MANUAL SET / DELETE MONTH WALLET ========= */
+    recreateMonthWallet.addEventListener("click", async () => {
+      if (!currentUser) { alert("Sign in first"); return; }
+      const m = monthPicker.value || todayMonth();
+      const val = prompt(`Set wallet amount for ${m} (number):`, (settings && settings.monthlyIncome) || "0");
+      if (val === null) return;
+      const num = Number(val) || 0;
+      try {
+        await setDoc(userWalletMonthDoc(currentUser.uid, m), { wallet: num, timestamp: new Date().toISOString(), note: 'Manual set by user' }, { merge: true });
+        alert('Saved');
+      } catch (e) { console.error(e); alert('Failed to save'); }
     });
 
-    /* ================ Delete ================ */
+    deleteWalletMonth.addEventListener("click", async () => {
+      if (!currentUser) { alert("Sign in first"); return; }
+      const m = monthPicker.value || todayMonth();
+      if (!confirm(`Delete wallet entry for ${m}? This cannot be undone.`)) return;
+      try {
+        await deleteDoc(userWalletMonthDoc(currentUser.uid, m));
+        alert('Deleted');
+      } catch (e) { console.error(e); alert('Failed to delete'); }
+    });
+
+    /* ========= ADD EXPENSE ========= */
+    addBtn.addEventListener("click", async () => {
+      appError.style.display='none'; appError.textContent='';
+      if (!currentUser) { appError.style.display='block'; appError.textContent='Please sign in first.'; return; }
+      const date = dateEl.value; const category = catEl.value; const amount = parseFloat(amtEl.value); const notes = (notesEl.value||"").trim();
+      if (!date || !category || !amount || amount <= 0) { appError.style.display='block'; appError.textContent='Please fill all fields correctly.'; return; }
+      if (category === 'Other' && !notes) { appError.style.display='block'; appError.textContent='Please add a note for "Other".'; return; }
+      try {
+        addBtn.disabled = true; addBtn.textContent = 'Adding...';
+        await addDoc(userExpensesRef(currentUser.uid), { uid: currentUser.uid, date: date, category, amount: Number(amount), notes });
+        // reset
+        catEl.value = ''; amtEl.value = ''; notesEl.value = ''; dateEl.value = new Date().toISOString().slice(0,10);
+      } catch (err) { console.error(err); appError.style.display='block'; appError.textContent='Failed to add expense.'; }
+      finally { addBtn.disabled=false; addBtn.textContent = '+ Add Expense'; }
+    });
+
+    /* ========= DELETE EXPENSE ========= */
     tbody.addEventListener("click", async (e) => {
       const btn = e.target.closest(".btn-del"); if (!btn) return;
       const id = btn.dataset.id; if (!id) return;
-      if (!currentUser) { alert("Not signed in"); return; }
+      if (!currentUser) { alert("Sign in first"); return; }
       if (!confirm("Delete this expense?")) return;
       try { await deleteDoc(doc(db, "users", currentUser.uid, "expenses", id)); } catch (err) { console.error(err); alert("Delete failed"); }
     });
 
-    /* ================ Filtering, searching & rendering ================ */
+    /* ========= RENDER & FILTER ========= */
     function renderFilteredData(){
+      const mode = viewMode.value; // 'month' or 'all'
       const monthVal = monthPicker.value; // YYYY-MM or empty
-      const search = (searchBox.value || "").trim().toLowerCase();
+      const search = (searchBox.value||'').trim().toLowerCase();
 
-      const filtered = allExpenses.filter(e => {
+      // compute filtered rows for table (based on view)
+      let filtered = allExpenses.filter(e => {
         if (!e.date) return false;
-        // month filter
-        if (monthVal && !String(e.date).startsWith(monthVal)) return false;
-        // search filter
+        if (mode === 'month') {
+          if (!monthVal) return false;
+          if (!String(e.date).startsWith(monthVal)) return false;
+        }
+        // search match
         if (search) {
           const hay = `${e.date} ${e.category} ${e.notes} ${e.amount}`.toLowerCase();
           return hay.indexOf(search) !== -1;
@@ -594,68 +659,85 @@
         return true;
       });
 
-      filtered.sort((a,b) => (b.date||'').localeCompare(a.date||''));
-      tbody.innerHTML = "";
+      // sort desc by date
+      filtered.sort((a,b)=> (b.date||'').localeCompare(a.date||''));
+
+      // render table
+      tbody.innerHTML = '';
       filtered.forEach(e => {
-        const notesText = e.notes && e.notes.trim() ? e.notes : "-";
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${e.date || "-"}</td>
-          <td>${e.category || "-"}</td>
-          <td>₹${fmt(e.amount)}</td>
-          <td style="max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${notesText}</td>
-          <td><button class="btn-del" data-id="${e.id}">Delete</button></td>
-        `;
+        const notesText = e.notes && e.notes.trim() ? e.notes : '-';
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${e.date}</td><td>${e.category}</td><td>₹${fmt(e.amount)}</td><td style="max-width:260px;overflow:hidden;text-overflow:ellipsis">${notesText}</td><td><button class="btn btn-del" data-id="${e.id}">Delete</button></td>`;
         tbody.appendChild(tr);
       });
 
+      // selected total
       const selTotal = filtered.reduce((s,x)=>s + (Number(x.amount)||0), 0);
       selectedTotalEl.textContent = fmt(selTotal);
 
-      // totals
-      const allTotal = allExpenses.reduce((s,x)=>s + (Number(x.amount)||0), 0);
-      const walletVal = Number((settings && settings.walletBalance) || 0);
-      // If a month is selected: compute monthSpent; else all-time
-      if (monthVal) {
-        const monthSpent = allExpenses.filter(e => String(e.date).startsWith(monthVal)).reduce((s,x)=>s+(Number(x.amount)||0),0);
-        spentAmountEl.textContent = `₹${fmt(monthSpent)}`;
-        // Remaining based on month (you chose Option B behavior)
-        const remaining = walletVal - monthSpent; // can be negative
-        remainingAmountEl.textContent = `₹${fmt((Math.round((remaining+Number.EPSILON)*100)/100))}`;
-        // budget check
-        const monthlyBudget = Number((settings && settings.monthlyBudget) || 0);
-        if (monthlyBudget > 0 && monthSpent > monthlyBudget) {
-          const exceeded = Math.round((monthSpent - monthlyBudget + Number.EPSILON) * 100) / 100;
-          budgetWarn.textContent = `Budget Exceeded by ₹${fmt(exceeded)}`;
-          budgetWarn.classList.remove("hidden");
-        } else {
-          budgetWarn.classList.add("hidden"); budgetWarn.textContent = "";
-        }
-      } else {
-        spentAmountEl.textContent = `₹${fmt(selTotal)}`;
-        // All-time remaining
-        const remainingAll = walletVal - allTotal;
-        remainingAmountEl.textContent = `₹${fmt((Math.round((remainingAll+Number.EPSILON)*100)/100))}`;
-        budgetWarn.classList.add("hidden"); budgetWarn.textContent = "";
-      }
+      // compute totals & wallet logic
+      // all-time totals
+      const allTotal = allExpenses.reduce((s,x)=>s + (Number(x.amount)||0),0);
 
-      walletAmountEl.textContent = `₹${fmt(walletVal)}`;
+      // compute totalWallet (sum of walletHistory)
+      const totalWallet = walletHistory.reduce((s,w)=>s + (Number(w.wallet)||0), 0);
+
+      if (mode === 'month') {
+        const m = monthVal;
+        if (!m) {
+          spentAmount.innerText = '—';
+          remainingAmount.innerText = '—';
+          walletAmount.innerText = '—';
+          budgetWarn.style.display='none';
+          return;
+        }
+        // monthSpent
+        const monthSpent = allExpenses.filter(e => String(e.date).startsWith(m)).reduce((s,x)=>s + (Number(x.amount)||0), 0);
+        // find wallet for this month
+        const mw = walletHistory.find(w => w.month === m);
+        const walletVal = mw ? Number(mw.wallet||0) : (settings ? Number(settings.monthlyIncome||0) : 0);
+        // remaining = walletVal - monthSpent (can be negative)
+        const remaining = walletVal - monthSpent;
+        // budget
+        const monthlyBudget = Number(settings ? settings.monthlyBudget || 0 : 0);
+        // apply to UI
+        document.getElementById('spentAmount').textContent = `₹${fmt(monthSpent)}`;
+        document.getElementById('walletAmount').textContent = `₹${fmt(walletVal)}`;
+        document.getElementById('remainingAmount').textContent = `₹${Number(Math.round(remaining * 100) / 100)}`;
+        // budget warning
+        if (monthlyBudget > 0 && monthSpent > monthlyBudget) {
+          const exceeded = Math.round((monthSpent - monthlyBudget) * 100) / 100;
+          budgetWarn.style.display='block';
+          budgetWarn.textContent = `Budget Exceeded by ₹${fmt(exceeded)}`;
+        } else { budgetWarn.style.display='none'; budgetWarn.textContent=''; }
+      } else {
+        // All time view
+        // spent = allTotal
+        // wallet total = totalWallet
+        const remainingAll = totalWallet - allTotal;
+        document.getElementById('spentAmount').textContent = `₹${fmt(allTotal)}`;
+        document.getElementById('walletAmount').textContent = `₹${fmt(totalWallet)}`;
+        document.getElementById('remainingAmount').textContent = `₹${Number(Math.round(remainingAll * 100) / 100)}`;
+        budgetWarn.style.display='none';
+      }
     }
 
-    monthPicker.addEventListener("change", () => renderFilteredData());
+    // hook inputs
+    monthPicker.addEventListener("change", () => {
+      // if switched to month view, ensure the month wallet exists
+      if (currentUser && viewMode.value === 'month') runMonthlyTopUpIfNeeded(currentUser.uid);
+      renderFilteredData();
+    });
+    viewMode.addEventListener("change", () => renderFilteredData());
     searchBox.addEventListener("input", () => renderFilteredData());
 
-    renderFilteredData();
-
-    /* ================ Edit & Save settings ================ */
-    editSettingsBtn.addEventListener("click", () => { settingsCard.classList.toggle("hidden"); });
-    cancelSettings.addEventListener("click", () => settingsCard.classList.add("hidden"));
-
+    /* ========= SETTINGS SAVE ========= */
     saveSettings.addEventListener("click", async () => {
       if (!currentUser) { alert("Sign in first"); return; }
       const docRef = userSettingsDoc(currentUser.uid);
       const newSettings = {
-        walletBalance: Number(walletInput.value) || 0,
+        monthlyIncome: Number(monthlyIncomeEl.value) || 0,
+        monthlyTopUpType: monthlyTopUpTypeEl.value || "reset",
         monthlyBudget: Number(monthlyBudgetInput.value) || 0,
         darkMode: !!darkToggle.checked,
         categoryBudgets: {
@@ -666,52 +748,125 @@
           Other: Number(bOther.value) || 0
         }
       };
-      try { await setDoc(docRef, newSettings, { merge: true }); settingsCard.classList.add("hidden"); }
-      catch (err) { console.error("save settings error", err); alert("Failed to save settings"); }
+      try { await setDoc(docRef, newSettings, { merge: true }); alert('Settings saved'); }
+      catch (e) { console.error(e); alert('Failed to save settings'); }
     });
 
     darkToggle.addEventListener("change", async () => {
       const isDark = darkToggle.checked;
       if (isDark) document.documentElement.setAttribute("data-theme","dark"); else document.documentElement.removeAttribute("data-theme");
       if (!currentUser) return;
-      try { const docRef = userSettingsDoc(currentUser.uid); await updateDoc(docRef, { darkMode: isDark }); }
-      catch (e) { console.error("dark toggle save error", e); }
+      try { await updateDoc(userSettingsDoc(currentUser.uid), { darkMode: isDark }); }
+      catch (e) { console.error('dark toggle save error', e); }
     });
 
-    /* ================ Export / Print (unchanged logic) ================ */
-    function buildReportRows(rangeFiltered){ return rangeFiltered.map(e => [e.date||"", e.category||"", e.amount||0, (e.notes||"").replace(/"/g,'""')]); }
-    function formatCSV(headerLines, rows){
-      let csv = ""; headerLines.forEach(l => { csv += `# ${l}\n`; });
-      csv += "\n"; csv += "Date,Category,Amount,Notes\n";
-      rows.forEach(r => { csv += `${r[0]},${r[1]},${r[2]},"${r[3]}"\n`; });
-      return csv;
-    }
+    /* ========= EXPORT (WALLET HISTORY + EXPENSES) ========= */
     exportMode.addEventListener("change", () => {
       const mode = exportMode.value;
-      if (mode === "range") { exportFrom.style.display = ""; exportTo.style.display = ""; } else { exportFrom.style.display = "none"; exportTo.style.display = "none"; }
-    });
-    exportBtn.addEventListener("click", () => {
-      let rows = []; let header = []; const mode = exportMode.value;
-      if (mode === "all") { header.push(`All time`); rows = buildReportRows(allExpenses.slice().sort((a,b)=>a.date.localeCompare(b.date))); }
-      else if (mode === "month") { const m = monthPicker.value; if (!m) { alert("Choose a month first"); return; } header.push(`Period: ${m}`); rows = buildReportRows(allExpenses.filter(e=>String(e.date).startsWith(m)).sort((a,b)=>a.date.localeCompare(b.date))); }
-      else if (mode === "range") { const f = exportFrom.value; const t = exportTo.value; if (!f||!t) { alert("Choose from and to dates"); return; } header.push(`Period: ${f} to ${t}`); rows = buildReportRows(allExpenses.filter(e => e.date >= f && e.date <= t).sort((a,b)=>a.date.localeCompare(b.date))); }
-      const total = rows.reduce((s,r)=>s + Number(r[2]||0),0); header.push(`Total Spent: ₹${fmt(total)}`); header.push(`Generated: ${new Date().toISOString().slice(0,10)}`);
-      const csv = formatCSV(header, rows);
-      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" }); const url = URL.createObjectURL(blob); const a = document.createElement("a");
-      const filename = `xpensive-export-${Date.now()}.csv`; a.href = url; a.download = filename; a.click();
+      if (mode === "range") { exportFrom.style.display='inline-block'; exportTo.style.display='inline-block'; } else { exportFrom.style.display='none'; exportTo.style.display='none'; }
     });
 
+    function buildCSV(lines){ return lines.join("\n"); }
+
+    exportBtn.addEventListener("click", async () => {
+      const mode = exportMode.value;
+      let header = []; let rows = []; // rows as CSV lines
+      // include wallet history snapshot header
+      header.push(`Xpensive Export`);
+      header.push(`Generated: ${new Date().toISOString()}`);
+      if (mode === 'all') {
+        header.push('Period: All time');
+        // Wallet history rows
+        rows.push('WALLET HISTORY - Month,Wallet,Note,Timestamp');
+        walletHistory.forEach(w => rows.push(`${w.month},${w.wallet},"${(w.note||'').replace(/"/g,'""')}",${w.ts||''}`));
+        rows.push('');
+        // Expense rows
+        rows.push('EXPENSES - Date,Category,Amount,Notes');
+        allExpenses.slice().sort((a,b)=>a.date.localeCompare(b.date)).forEach(e => rows.push(`${e.date},${e.category},${e.amount},"${(e.notes||'').replace(/"/g,'""')}"`));
+        // totals
+        const totalWallet = walletHistory.reduce((s,w)=>s + (Number(w.wallet)||0),0);
+        const totalSpent = allExpenses.reduce((s,x)=>s + (Number(x.amount)||0),0);
+        rows.push('');
+        rows.push(`TOTAL WALLET,${totalWallet}`);
+        rows.push(`TOTAL SPENT,${totalSpent}`);
+        rows.push(`REMAINING,${totalWallet - totalSpent}`);
+      } else if (mode === 'month') {
+        const m = monthPicker.value;
+        if (!m) { alert('Choose a month first'); return; }
+        header.push(`Period: ${m}`);
+        // wallet for month
+        const w = walletHistory.find(x=>x.month===m);
+        rows.push(`WALLET,${m},${w ? w.wallet : (settings ? settings.monthlyIncome : 0)}`);
+        rows.push('');
+        rows.push('EXPENSES - Date,Category,Amount,Notes');
+        const ex = allExpenses.filter(e => String(e.date).startsWith(m)).sort((a,b)=>a.date.localeCompare(b.date));
+        ex.forEach(e => rows.push(`${e.date},${e.category},${e.amount},"${(e.notes||'').replace(/"/g,'""')}"`));
+        const monthSpent = ex.reduce((s,x)=>s + (Number(x.amount)||0),0);
+        rows.push('');
+        rows.push(`TOTAL SPENT,${monthSpent}`);
+        rows.push(`REMAINING,${(w?w.wallet:(settings?settings.monthlyIncome:0)) - monthSpent}`);
+      } else if (mode === 'range') {
+        const f = exportFrom.value; const t = exportTo.value;
+        if (!f || !t) { alert('Choose from and to dates'); return; }
+        header.push(`Period: ${f} to ${t}`);
+        // wallets within range: include any months that intersect the range
+        rows.push('WALLET HISTORY - Month,Wallet,Note,Timestamp');
+        walletHistory.filter(w=>{
+          // month start day as 'YYYY-MM-01' compare lexicographically
+          const monthStart = `${w.month}-01`;
+          return monthStart >= f && monthStart <= t;
+        }).forEach(w => rows.push(`${w.month},${w.wallet},"${(w.note||'').replace(/"/g,'""')}",${w.ts||''}`));
+        rows.push('');
+        rows.push('EXPENSES - Date,Category,Amount,Notes');
+        const ex = allExpenses.filter(e => e.date >= f && e.date <= t).sort((a,b)=>a.date.localeCompare(b.date));
+        ex.forEach(e => rows.push(`${e.date},${e.category},${e.amount},"${(e.notes||'').replace(/"/g,'""')}"`));
+        const totalWalletRange = walletHistory.filter(w=>(`${w.month}-01`) >= f && (`${w.month}-01`) <= t).reduce((s,x)=>s + (Number(x.wallet)||0),0);
+        const totalSpentRange = ex.reduce((s,x)=>s + (Number(x.amount)||0),0);
+        rows.push('');
+        rows.push(`TOTAL WALLET IN RANGE,${totalWalletRange}`);
+        rows.push(`TOTAL SPENT IN RANGE,${totalSpentRange}`);
+        rows.push(`REMAINING,${totalWalletRange - totalSpentRange}`);
+      }
+
+      const out = header.concat(['']).concat(rows).join("\n");
+      const blob = new Blob([out], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url; a.download = `xpensive-export-${Date.now()}.csv`; a.click();
+    });
+
+    /* ========= PRINT REPORT (structured) ========= */
     printReport.addEventListener("click", () => {
-      const mode = exportMode.value; let rows = []; let title = "";
-      if (mode === "all") { title = "All time"; rows = allExpenses.slice().sort((a,b)=>a.date.localeCompare(b.date)); }
-      else if (mode === "month") { const m = monthPicker.value; if (!m) { alert("Choose a month first"); return; } title = m; rows = allExpenses.filter(e=>String(e.date).startsWith(m)).sort((a,b)=>a.date.localeCompare(b.date)); }
-      else { const f=exportFrom.value; const t=exportTo.value; if(!f||!t){alert("Choose from/to");return;} title = `${f} to ${t}`; rows = allExpenses.filter(e => e.date >= f && e.date <= t).sort((a,b)=>a.date.localeCompare(b.date)); }
-      const total = rows.reduce((s,x)=>s + Number(x.amount||0),0);
-      const popup = window.open("", "_blank", "width=900,height=700");
-      const html = `<html><head><title>Xpensive Report - ${title}</title><style>body{font-family:Arial;padding:20px;color:#111}h1{color:#111}table{width:100%;border-collapse:collapse}th,td{padding:8px;border:1px solid #ddd;text-align:left}.muted{color:#666;font-size:14px}</style></head><body><h1>Xpensive — Expense Report</h1><div class="muted">Period: ${title}</div><div class="muted">Generated: ${new Date().toISOString().slice(0,10)}</div><div style="margin-top:10px;font-weight:700">Total Spent: ₹${fmt(total)}</div><table style="margin-top:12px"><thead><tr><th>Date</th><th>Category</th><th>Amount</th><th>Notes</th></tr></thead><tbody>${rows.map(r => `<tr><td>${r.date}</td><td>${r.category}</td><td>₹${fmt(r.amount)}</td><td>${(r.notes||"")}</td></tr>`).join("")}</tbody></table></body></html>`;
-      popup.document.write(html); popup.document.close(); popup.focus(); setTimeout(()=>popup.print(),600);
+      const mode = exportMode.value;
+      let rowsHTML = '';
+      if (mode === 'all') {
+        // wallet history table + expenses table
+        rowsHTML += `<h3>Wallet history</h3><table border=1 cellpadding=6 style="border-collapse:collapse"><thead><tr><th>Month</th><th>Wallet</th><th>Note</th><th>Timestamp</th></tr></thead><tbody>`;
+        walletHistory.forEach(w => rowsHTML += `<tr><td>${w.month}</td><td>₹${fmt(w.wallet)}</td><td>${(w.note||'')}</td><td>${w.ts||''}</td></tr>`);
+        rowsHTML += `</tbody></table><h3 style="margin-top:12px">Expenses</h3><table border=1 cellpadding=6 style="border-collapse:collapse"><thead><tr><th>Date</th><th>Category</th><th>Amount</th><th>Notes</th></tr></thead><tbody>`;
+        allExpenses.slice().sort((a,b)=>a.date.localeCompare(b.date)).forEach(e => rowsHTML += `<tr><td>${e.date}</td><td>${e.category}</td><td>₹${fmt(e.amount)}</td><td>${(e.notes||'')}</td></tr>`);
+        rowsHTML += `</tbody></table>`;
+      } else if (mode === 'month') {
+        const m = monthPicker.value;
+        if (!m) { alert('Choose a month first'); return; }
+        const w = walletHistory.find(x=>x.month===m);
+        rowsHTML += `<div><strong>Month:</strong> ${m}</div><div><strong>Wallet:</strong> ₹${fmt(w ? w.wallet : (settings?settings.monthlyIncome:0))}</div>`;
+        rowsHTML += `<h3 style="margin-top:10px">Expenses</h3><table border=1 cellpadding=6 style="border-collapse:collapse"><thead><tr><th>Date</th><th>Category</th><th>Amount</th><th>Notes</th></tr></thead><tbody>`;
+        allExpenses.filter(e=>String(e.date).startsWith(m)).forEach(e => rowsHTML += `<tr><td>${e.date}</td><td>${e.category}</td><td>₹${fmt(e.amount)}</td><td>${(e.notes||'')}</td></tr>`);
+        rowsHTML += `</tbody></table>`;
+      } else {
+        alert('Use Export CSV for range/all-time printing.');
+        return;
+      }
+      const popup = window.open('','_blank','width=900,height=700');
+      popup.document.write(`<html><head><title>Xpensive Report</title></head><body><h1>Xpensive Report</h1>${rowsHTML}</body></html>`);
+      popup.document.close(); popup.print();
     });
 
+    /* ========= INITIAL RENDER (empty) ========= */
+    renderFilteredData();
+
+    /* ========= END OF SCRIPT ========= */
   </script>
 </body>
 </html>
