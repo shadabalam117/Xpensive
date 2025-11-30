@@ -1,16 +1,18 @@
 <!doctype html>
-
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Xpensive — Expense Tracker (Fixed)</title>
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5224002796936482"
-     crossorigin="anonymous"></script>
+  <title>Xpensive — Expense Tracker (Cloud + Wallet + Budget)</title>
+
   <style>
     :root{
       --brand:#22c55e; --brand-dark:#16a34a; --bg:#f4f6f8; --card:#fff;
       --text:#111827; --muted:#6b7280; --danger:#ef4444; --radius:12px;
+      --glass: rgba(255,255,255,0.6);
+    }
+    [data-theme="dark"]{
+      --bg:#0f172a; --card:#0f172a; --text:#e6eef6; --muted:#94a3b8; --glass: rgba(255,255,255,0.03);
     }
     *{box-sizing:border-box}
     body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
@@ -26,10 +28,11 @@
     #authBtns{display:flex;gap:8px;margin-top:10px}
     #authBtns button{flex:1;padding:10px;border-radius:8px;border:none;cursor:pointer}
     button.primary{background:var(--brand);color:#fff;border:none;padding:10px;border-radius:8px;font-weight:700;cursor:pointer}
-    button.secondary{background:#f3f4f6;border:1px solid #e5e7eb}
+    button.secondary{background:#f3f4f6;border:1px solid #e5e7eb;padding:10px;border-radius:8px;cursor:pointer}
+    .googleBtn{background:#fff;border:1px solid #e6e6e6;display:flex;align-items:center;gap:10px;justify-content:center}
     /* form */
     label{font-weight:600;margin-top:8px;display:block}
-    input[type="date"], input[type="month"], select, input[type="number"], textarea{width:100%;height:42px;padding:8px 10px;border-radius:8px;border:1px solid #e6e6e6}
+    input[type="date"], input[type="month"], select, input[type="number"], textarea{width:100%;height:42px;padding:8px 10px;border-radius:8px;border:1px solid #e6e6e6;background:transparent}
     textarea{height:80px;resize:vertical;padding:10px}
     .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}
     .btn-row{display:flex;gap:10px}
@@ -40,6 +43,7 @@
     thead th{background:var(--brand);color:#fff;padding:12px;text-align:left}
     tbody td{padding:12px;border-top:1px solid #f1f5f9;vertical-align:middle;white-space:nowrap}
     tbody tr:nth-child(even){background:#fafafa}
+    tbody tr:hover {background:#eefbf4; transition:0.15s}
     .btn-del{background:var(--danger);color:white;border:none;padding:7px 10px;border-radius:8px;cursor:pointer}
     .btn-del:hover{background:#d02323}
     .summary{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
@@ -47,20 +51,30 @@
     .chip{background:#f3f4f6;padding:6px 10px;border-radius:999px;border:1px solid #e6e6e6}
     .right{text-align:right}
     .error{color:var(--danger);font-size:14px;margin-top:8px}
+    .muted-chip{background:var(--glass);padding:8px;border-radius:10px}
+    .progress{height:10px;border-radius:999px;background:#f3f4f6;overflow:hidden}
+    .progress > i{display:block;height:100%;background:linear-gradient(90deg,var(--brand),var(--brand-dark));}
+    .top-controls{display:flex;gap:10px;align-items:center}
+    .search{padding:8px 10px;border-radius:8px;border:1px solid #e6e6e6;min-width:200px}
+    .settings-panel{display:flex;gap:10px;align-items:center}
+    .small-muted{font-size:12px;color:var(--muted)}
+    .settings-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
     @media (max-width:520px){
       .grid{grid-template-columns:1fr}
       table{min-width:560px}
+      .summary{flex-direction:column;align-items:flex-start}
     }
   </style>
 </head>
 <body>
   <header>💰 Xpensive — Expense Tracker</header>
-  <main><!-- AUTH Card -->
+  <main>
+    <!-- AUTH Card -->
 <section id="authCard" class="card">
-  <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
     <div>
       <div style="font-size:18px;font-weight:700">Sign in or Create account</div>
-      <div class="small muted">Use Email/Password to keep your expenses private.</div>
+      <div class="small muted">Use Email/Password or Google to keep your expenses private and synced.</div>
     </div>
     <div id="userInfo" class="hidden" style="text-align:right">
       <div class="small muted">Signed in as</div>
@@ -69,13 +83,17 @@
     </div>
   </div>
 
-  <div id="authForms" style="margin-top:12px">
+  <div id="authForms" style="margin-top:12px;max-width:540px">
     <input id="nameField" type="text" placeholder="Full name (for signup)" />
     <input id="emailField" type="email" placeholder="Email" />
     <input id="passwordField" type="password" placeholder="Password (min 6 chars)" />
     <div id="authBtns">
       <button id="signInBtn" class="secondary">Sign in</button>
       <button id="signUpBtn" class="primary">Create account</button>
+    </div>
+    <div style="margin-top:8px;display:flex;gap:8px">
+      <button id="googleBtn" class="googleBtn">Continue with Google</button>
+      <button id="demoBtn" class="secondary">Demo (no auth)</button>
     </div>
     <div id="authError" class="error hidden"></div>
   </div>
@@ -93,18 +111,82 @@
       <div class="chip"><button id="signOutBtn" class="secondary">Sign out</button></div>
     </div>
 
-    <div style="display:flex;gap:10px;align-items:center;">
-      <label for="monthPicker" class="small muted" style="margin:0 8px 0 0">Month</label>
-      <input id="monthPicker" type="month" />
-      <label for="yearPicker" class="small muted" style="margin:0 8px 0 0">Year</label>
-      <select id="yearPicker" class="chip"><option value="all">All years</option></select>
+    <div class="top-controls" style="flex:1;justify-content:center">
+      <div class="muted-chip" style="padding:10px;border-radius:10px">
+        <div class="small-muted">Wallet</div>
+        <div id="walletAmount" class="big">₹0</div>
+      </div>
+
+      <div class="muted-chip" style="padding:10px;border-radius:10px">
+        <div class="small-muted">Spent (sel)</div>
+        <div id="spentAmount" class="big">₹0</div>
+      </div>
+
+      <div class="muted-chip" style="padding:10px;border-radius:10px">
+        <div class="small-muted">Remaining Wallet</div>
+        <div id="remainingAmount" class="big">₹0</div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;align-items:flex-start;gap:6px">
+        <div class="small muted">Month</div>
+        <input id="monthPicker" type="month" />
+      </div>
+
+      <div style="display:flex;flex-direction:column;align-items:flex-start;gap:6px">
+        <div class="small muted">Export</div>
+        <div class="settings-row">
+          <select id="exportMode" class="chip">
+            <option value="month">Selected month</option>
+            <option value="range">Date range</option>
+            <option value="all">All time</option>
+          </select>
+          <input id="exportFrom" type="date" class="chip" style="display:none" />
+          <input id="exportTo" type="date" class="chip" style="display:none" />
+          <button id="exportBtn" class="secondary">Export CSV</button>
+          <button id="printReport" class="secondary">Print Report</button>
+        </div>
+      </div>
     </div>
 
-    <div style="text-align:right">
-      <div class="small muted">All-time total</div>
-      <div id="allTimeTotal" class="big">₹0</div>
+    <div style="display:flex;gap:10px;align-items:center;">
+      <input id="searchBox" class="search" placeholder="Search notes, category, amount or date" />
+      <div class="chip settings-panel">
+        <label class="small-muted" for="darkToggle">Dark</label>
+        <input id="darkToggle" type="checkbox" />
+        <button id="editSettings" class="secondary">Edit Wallet / Budgets</button>
+      </div>
     </div>
   </div>
+
+  <!-- settings editor -->
+  <section id="settingsCard" class="card hidden">
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <div style="min-width:180px">
+        <label>Wallet Balance (₹)</label>
+        <input id="walletInput" type="number" step="0.01" />
+      </div>
+      <div style="min-width:180px">
+        <label>Monthly Budget (₹)</label>
+        <input id="monthlyBudgetInput" type="number" step="0.01" />
+      </div>
+
+      <div style="flex:1;min-width:200px">
+        <label>Category Budgets (₹)</label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <input id="bFood" placeholder="Food" type="number" class="chip" />
+          <input id="bTransport" placeholder="Transport" type="number" class="chip" />
+          <input id="bShopping" placeholder="Shopping" type="number" class="chip" />
+          <input id="bBills" placeholder="Bills" type="number" class="chip" />
+          <input id="bOther" placeholder="Other" type="number" class="chip" />
+        </div>
+      </div>
+
+      <div style="display:flex;gap:8px">
+        <button id="saveSettings" class="primary">Save</button>
+        <button id="cancelSettings" class="secondary">Cancel</button>
+      </div>
+    </div>
+  </section>
 
   <!-- add expense -->
   <section class="card">
@@ -161,16 +243,19 @@
   </section>
 </section>
 
-  </main>  <!-- Firebase (ESM v12) -->  <script type="module">
+  </main>
+
+  <!-- Firebase (ESM v12) -->
+  <script type="module">
     /* ================== imports ================== */
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
     import {
       getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut,
-      onAuthStateChanged, updateProfile
+      onAuthStateChanged, updateProfile, GoogleAuthProvider, signInWithPopup
     } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
     import {
       getFirestore, collection, addDoc, deleteDoc, doc,
-      onSnapshot, query, orderBy
+      onSnapshot, query, orderBy, getDoc, setDoc, updateDoc
     } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
     /* ================ config (your project) ================ */
@@ -203,6 +288,8 @@
     const passwordField = document.getElementById("passwordField");
     const signInBtn = document.getElementById("signInBtn");
     const signUpBtn = document.getElementById("signUpBtn");
+    const googleBtn = document.getElementById("googleBtn");
+    const demoBtn = document.getElementById("demoBtn");
 
     const appSection = document.getElementById("app");
     const me = document.getElementById("me");
@@ -214,10 +301,31 @@
     const addBtn = document.getElementById("addBtn");
     const tbody = document.getElementById("tbody");
     const selectedTotalEl = document.getElementById("selectedTotal");
-    const allTimeTotalEl = document.getElementById("allTimeTotal");
     const monthPicker = document.getElementById("monthPicker");
-    const yearPicker = document.getElementById("yearPicker");
     const appError = document.getElementById("appError");
+    const searchBox = document.getElementById("searchBox");
+
+    const walletAmountEl = document.getElementById("walletAmount");
+    const spentAmountEl = document.getElementById("spentAmount");
+    const remainingAmountEl = document.getElementById("remainingAmount");
+    const editSettingsBtn = document.getElementById("editSettings");
+    const settingsCard = document.getElementById("settingsCard");
+    const walletInput = document.getElementById("walletInput");
+    const monthlyBudgetInput = document.getElementById("monthlyBudgetInput");
+    const bFood = document.getElementById("bFood");
+    const bTransport = document.getElementById("bTransport");
+    const bShopping = document.getElementById("bShopping");
+    const bBills = document.getElementById("bBills");
+    const bOther = document.getElementById("bOther");
+    const saveSettings = document.getElementById("saveSettings");
+    const cancelSettings = document.getElementById("cancelSettings");
+    const darkToggle = document.getElementById("darkToggle");
+
+    const exportMode = document.getElementById("exportMode");
+    const exportFrom = document.getElementById("exportFrom");
+    const exportTo = document.getElementById("exportTo");
+    const exportBtn = document.getElementById("exportBtn");
+    const printReport = document.getElementById("printReport");
 
     // default date = today
     dateEl.value = new Date().toISOString().slice(0,10);
@@ -236,7 +344,6 @@
 
     /* ================ friendly error messages ================ */
     function friendlyAuthError(err){
-      // Firebase errors often have .code like 'auth/email-already-in-use'
       const code = (err && err.code) ? String(err.code) : (err && err.message ? String(err.message) : '');
       const m = String(code).match(/auth\/(.+)$/);
       const key = m ? m[1] : code;
@@ -250,7 +357,6 @@
         'popup-blocked': 'Popup blocked by browser. Allow popups and try again.'
       };
       if (map[key]) return map[key];
-      // fallback: try to clean the message a bit
       return (err && err.message) ? String(err.message).replace(/^Firebase:\s*/i, '') : 'An unexpected error occurred.';
     }
 
@@ -266,7 +372,6 @@
         if (name) {
           await updateProfile(cred.user, { displayName: name });
         }
-        // success — onAuthStateChanged will handle UI
       } catch (err) {
         authError.textContent = friendlyAuthError(err); authError.classList.remove("hidden");
       }
@@ -284,34 +389,52 @@
       }
     });
 
+    // Google sign-in
+    googleBtn.addEventListener("click", async () => {
+      authError.classList.add("hidden"); authError.textContent = "";
+      const provider = new GoogleAuthProvider();
+      try {
+        await signInWithPopup(auth, provider);
+      } catch (err) {
+        authError.textContent = friendlyAuthError(err); authError.classList.remove("hidden");
+      }
+    });
+
+    // Demo mode (no-auth) - useful for quick local testing (NOT recommended for production)
+    demoBtn.addEventListener("click", () => {
+      alert("Demo mode: no cloud sync. Sign in to use cloud features.");
+      // show app but no cloud — keep currentUser null (we'll not enable cloud features)
+      authCard.classList.add("hidden");
+      appSection.classList.remove("hidden");
+      me.textContent = "Demo (local only)";
+    });
+
     signOutBtn.addEventListener("click", () => auth.signOut());
     signOutTop.addEventListener("click", () => auth.signOut());
 
     /* ================ State ================ */
     let currentUser = null;
     let unsubscribeExpenses = null;
+    let unsubscribeSettings = null;
     let allExpenses = [];
+    let settings = null; // local copy of settings doc
 
     function userExpensesRef(uid){ return collection(db, "users", uid, "expenses"); }
+    function userSettingsDoc(uid){ return doc(db, "users", uid, "settings", "prefs"); }
     function fmt(n){ return Number(n).toLocaleString(); }
 
-    /* helper: normalize expense doc data so UI code doesn't break when Firestore has mixed types */
+    /* helper: normalize expense doc data */
     function normalizeExpenseData(d){
       const out = Object.assign({}, d);
-      // amount: ensure number
       if (typeof out.amount === 'string') out.amount = parseFloat(out.amount) || 0;
       if (typeof out.amount !== 'number') out.amount = Number(out.amount) || 0;
-
-      // date: convert Firestore Timestamp -> YYYY-MM-DD string, or ensure string
       if (out.date && typeof out.date === 'object' && typeof out.date.toDate === 'function'){
         try { out.date = out.date.toDate().toISOString().slice(0,10); } catch(e){ out.date = '' }
       } else if (typeof out.date === 'number'){
-        // epoch millis
         try { out.date = new Date(out.date).toISOString().slice(0,10); } catch(e){ out.date = '' }
       } else if (typeof out.date !== 'string'){
         out.date = out.date ? String(out.date) : '';
       }
-
       out.category = out.category || 'Other';
       out.notes = out.notes || '';
       out.uid = out.uid || '';
@@ -331,8 +454,9 @@
         userInfo.classList.remove("hidden");
         userEmail.textContent = user.email || user.displayName || "";
         me.textContent = user.displayName ? `${user.displayName} (${user.email})` : user.email;
-        // start listening to user expenses
+        // start listeners
         startExpensesListener(user.uid);
+        startSettingsListener(user.uid);
       } else {
         // show auth card
         authCard.classList.remove("hidden");
@@ -340,9 +464,11 @@
         userInfo.classList.add("hidden");
         userEmail.textContent = "";
         me.textContent = "";
-        // detach listener
+        // detach listeners
         if (unsubscribeExpenses) { unsubscribeExpenses(); unsubscribeExpenses = null; }
+        if (unsubscribeSettings) { unsubscribeSettings(); unsubscribeSettings = null; }
         allExpenses = [];
+        settings = null;
         renderFilteredData();
       }
     });
@@ -358,13 +484,78 @@
           const norm = normalizeExpenseData(d);
           allExpenses.push({ id: s.id, ...norm });
         });
-        populateYearPicker();
         renderFilteredData();
       }, err => {
         console.error("snapshot error", err);
         appError.textContent = "Failed to load expenses.";
         appError.classList.remove("hidden");
       });
+    }
+
+    /* ================ Settings (single doc) listener ================ */
+    async function ensureSettingsDoc(uid){
+      const sref = userSettingsDoc(uid);
+      try {
+        const snap = await getDoc(sref);
+        if (!snap.exists()) {
+          // create default settings
+          const defaults = {
+            walletBalance: 0,
+            monthlyBudget: 0,
+            darkMode: false,
+            categoryBudgets: {
+              Food: 0, Transport: 0, Shopping: 0, Bills: 0, Other: 0
+            }
+          };
+          await setDoc(sref, defaults);
+          return defaults;
+        } else {
+          return snap.data();
+        }
+      } catch (e) {
+        console.error("ensureSettingsDoc error", e);
+        return null;
+      }
+    }
+
+    function startSettingsListener(uid){
+      if (unsubscribeSettings) unsubscribeSettings();
+      const sref = userSettingsDoc(uid);
+      // ensure doc exists first, then listen
+      ensureSettingsDoc(uid).then(() => {
+        unsubscribeSettings = onSnapshot(sref, snap => {
+          if (snap.exists()) {
+            settings = snap.data();
+          } else {
+            settings = null;
+          }
+          applySettingsToUI();
+          renderFilteredData();
+        }, err => {
+          console.error("settings snapshot error", err);
+        });
+      });
+    }
+
+    /* ================ Apply settings to UI ================ */
+    function applySettingsToUI(){
+      if (!settings) {
+        walletAmountEl.textContent = `₹0`;
+        walletInput.value = "";
+        monthlyBudgetInput.value = "";
+        bFood.value = ""; bTransport.value = ""; bShopping.value = ""; bBills.value = ""; bOther.value = "";
+        darkToggle.checked = false;
+        document.documentElement.removeAttribute("data-theme");
+        return;
+      }
+      const w = Number(settings.walletBalance || 0);
+      walletAmountEl.textContent = `₹${fmt(w)}`;
+      walletInput.value = settings.walletBalance || "";
+      monthlyBudgetInput.value = settings.monthlyBudget || "";
+      const cb = settings.categoryBudgets || {};
+      bFood.value = cb.Food || ""; bTransport.value = cb.Transport || ""; bShopping.value = cb.Shopping || ""; bBills.value = cb.Bills || ""; bOther.value = cb.Other || "";
+      darkToggle.checked = !!settings.darkMode;
+      if (settings.darkMode) document.documentElement.setAttribute("data-theme","dark"); else document.documentElement.removeAttribute("data-theme");
     }
 
     /* ================ Add expense (per-user) ================ */
@@ -384,15 +575,20 @@
         appError.textContent = 'Please add a note for "Other" category.'; appError.classList.remove("hidden"); return;
       }
 
+      if (addBtn.disabled) return; // prevent double-click
+
       try {
         addBtn.disabled = true; addBtn.textContent = 'Adding...';
-        // store date explicitly as string (YYYY-MM-DD). This avoids mixed Timestamp/string issues.
         await addDoc(userExpensesRef(currentUser.uid), {
           uid: currentUser.uid,
           date: date,
           category, amount: Number(amount), notes
         });
-        amtEl.value = ""; if (category === "Other") notesEl.value = "";
+        // reset fields (keep date)
+        catEl.value = "";
+        amtEl.value = "";
+        notesEl.value = "";
+        notesWrap.style.display = "none";
         amtEl.focus();
       } catch (err) {
         console.error(err);
@@ -419,30 +615,24 @@
       }
     });
 
-    /* ================ Filtering & render ================ */
-    function populateYearPicker(){
-      const years = new Set();
-      allExpenses.forEach(e => { if (e.date && typeof e.date === 'string' && e.date.length>=4) years.add(String(e.date).slice(0,4)); });
-      const arr = Array.from(years).sort((a,b)=>b-a);
-      const cur = yearPicker.value || "all";
-      yearPicker.innerHTML = '<option value="all">All years</option>';
-      arr.forEach(y => { const opt = document.createElement("option"); opt.value = y; opt.textContent = y; yearPicker.appendChild(opt); });
-      // keep previous selection if possible
-      if (arr.includes(cur)) yearPicker.value = cur; else yearPicker.value = (arr.length ? arr[0] : "all");
-    }
-
+    /* ================ Filtering, search & render ================ */
     function renderFilteredData(){
       const monthVal = monthPicker.value; // YYYY-MM or empty
-      const yearVal = yearPicker.value; // all or YYYY
+      const search = (searchBox.value || "").trim().toLowerCase();
 
       const filtered = allExpenses.filter(e => {
         if (!e.date) return false;
-        if (monthVal) return String(e.date).startsWith(monthVal);
-        if (yearVal && yearVal !== "all") return String(e.date).startsWith(yearVal);
+        // month filter
+        if (monthVal && !String(e.date).startsWith(monthVal)) return false;
+        // search filter across date, category, notes, amount
+        if (search) {
+          const hay = `${e.date} ${e.category} ${e.notes} ${e.amount}`.toLowerCase();
+          return hay.indexOf(search) !== -1;
+        }
         return true;
       });
 
-      // sort by date desc (strings in YYYY-MM-DD sort correctly)
+      // sort by date desc
       filtered.sort((a,b) => (b.date||'').localeCompare(a.date||''));
 
       // render rows
@@ -463,24 +653,181 @@
       const selTotal = filtered.reduce((s,x)=>s + (Number(x.amount)||0), 0);
       selectedTotalEl.textContent = fmt(selTotal);
 
+      // compute all-time totals and spent for month
       const allTotal = allExpenses.reduce((s,x)=>s + (Number(x.amount)||0), 0);
-      allTimeTotalEl.textContent = fmt(allTotal);
+      // compute spent for currently selected month
+      const monthFilter = monthPicker.value;
+      const monthSpent = monthFilter ? allExpenses.filter(e=>String(e.date).startsWith(monthFilter)).reduce((s,x)=>s+(Number(x.amount)||0),0) : selTotal;
+
+      // update wallet/spent/remaining UI
+      const walletVal = Number((settings && settings.walletBalance) || 0);
+      const remaining = walletVal - allTotal;
+      walletAmountEl.textContent = `₹${fmt(walletVal)}`;
+      spentAmountEl.textContent = `₹${fmt(monthSpent)}`;
+      remainingAmountEl.textContent = `₹${fmt(remaining >= 0 ? remaining : 0)}`;
+
+      // show category progress if settings exist (not visual heavy — simple console or future UI)
+      // (you can build small widgets for each category if desired)
     }
 
-    // filters events
+    // events
     monthPicker.addEventListener("change", () => {
-      if (monthPicker.value) yearPicker.value = monthPicker.value.slice(0,4);
       renderFilteredData();
     });
-    yearPicker.addEventListener("change", () => {
-      // when year changed we reset month (you can change behavior if you want month+year selection)
-      monthPicker.value = "";
-      renderFilteredData();
-    });
+    searchBox.addEventListener("input", () => renderFilteredData());
 
     // initial empty render
     renderFilteredData();
 
+    /* ================ Edit & Save Settings (cloud) ================ */
+    editSettingsBtn.addEventListener("click", () => {
+      settingsCard.classList.toggle("hidden");
+    });
+    cancelSettings.addEventListener("click", () => settingsCard.classList.add("hidden"));
+
+    saveSettings.addEventListener("click", async () => {
+      if (!currentUser) { alert("Sign in first"); return; }
+      const docRef = userSettingsDoc(currentUser.uid);
+      const newSettings = {
+        walletBalance: Number(walletInput.value) || 0,
+        monthlyBudget: Number(monthlyBudgetInput.value) || 0,
+        darkMode: !!darkToggle.checked,
+        categoryBudgets: {
+          Food: Number(bFood.value) || 0,
+          Transport: Number(bTransport.value) || 0,
+          Shopping: Number(bShopping.value) || 0,
+          Bills: Number(bBills.value) || 0,
+          Other: Number(bOther.value) || 0
+        }
+      };
+      try {
+        await setDoc(docRef, newSettings, { merge: true });
+        settingsCard.classList.add("hidden");
+      } catch (err) {
+        console.error("save settings error", err);
+        alert("Failed to save settings");
+      }
+    });
+
+    // dark toggle immediate save locally (and will sync via settings listener if signed-in)
+    darkToggle.addEventListener("change", async () => {
+      const isDark = darkToggle.checked;
+      if (isDark) document.documentElement.setAttribute("data-theme","dark"); else document.documentElement.removeAttribute("data-theme");
+      if (!currentUser) return;
+      try {
+        const docRef = userSettingsDoc(currentUser.uid);
+        await updateDoc(docRef, { darkMode: isDark });
+      } catch (e) {
+        console.error("dark toggle save error", e);
+      }
+    });
+
+    /* ================ Export CSV / Print Report ================ */
+    function buildReportRows(rangeFiltered){
+      // returns array of rows with columns: Date,Category,Amount,Notes
+      return rangeFiltered.map(e => [e.date || "", e.category || "", e.amount || 0, (e.notes||"").replace(/"/g,'""')]);
+    }
+
+    function formatCSV(headerLines, rows){
+      // headerLines: array of strings
+      // rows: array of arrays
+      let csv = "";
+      headerLines.forEach(l => { csv += `# ${l}\n`; });
+      csv += "\n";
+      csv += "Date,Category,Amount,Notes\n";
+      rows.forEach(r => {
+        csv += `${r[0]},${r[1]},${r[2]},"${r[3]}"\n`;
+      });
+      return csv;
+    }
+
+    exportMode.addEventListener("change", () => {
+      const mode = exportMode.value;
+      if (mode === "range") {
+        exportFrom.style.display = ""; exportTo.style.display = "";
+      } else {
+        exportFrom.style.display = "none"; exportTo.style.display = "none";
+      }
+    });
+
+    exportBtn.addEventListener("click", () => {
+      // determine range of items to export
+      let rows = [];
+      let header = [];
+      const mode = exportMode.value;
+      if (mode === "all") {
+        header.push(`Period: All time`);
+        rows = buildReportRows(allExpenses.slice().sort((a,b)=>a.date.localeCompare(b.date)));
+      } else if (mode === "month") {
+        const m = monthPicker.value;
+        if (!m) { alert("Choose a month first"); return; }
+        header.push(`Period: ${m}`);
+        const filtered = allExpenses.filter(e => String(e.date).startsWith(m));
+        rows = buildReportRows(filtered.sort((a,b)=>a.date.localeCompare(b.date)));
+      } else if (mode === "range") {
+        const f = exportFrom.value; const t = exportTo.value;
+        if (!f || !t) { alert("Choose from and to dates"); return; }
+        header.push(`Period: ${f} to ${t}`);
+        const filtered = allExpenses.filter(e => e.date >= f && e.date <= t);
+        rows = buildReportRows(filtered.sort((a,b)=>a.date.localeCompare(b.date)));
+      }
+      // compute summary numbers
+      const total = rows.reduce((s,r)=>s + Number(r[2]||0),0);
+      header.push(`Total Spent: ₹${fmt(total)}`);
+      header.push(`Generated: ${new Date().toISOString().slice(0,10)}`);
+      const csv = formatCSV(header, rows);
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      const filename = `xpensive-export-${Date.now()}.csv`;
+      a.href = url; a.download = filename; a.click();
+    });
+
+    // Print report (structured) — uses new window and window.print
+    printReport.addEventListener("click", () => {
+      const mode = exportMode.value;
+      let rows = []; let title = "";
+      if (mode === "all") { title = "All time"; rows = allExpenses.slice().sort((a,b)=>a.date.localeCompare(b.date)); }
+      else if (mode === "month") { const m = monthPicker.value; if (!m) { alert("Choose a month first"); return; } title = m; rows = allExpenses.filter(e=>String(e.date).startsWith(m)).sort((a,b)=>a.date.localeCompare(b.date)); }
+      else { const f=exportFrom.value; const t=exportTo.value; if(!f||!t){alert("Choose from/to");return;} title = `${f} to ${t}`; rows = allExpenses.filter(e => e.date >= f && e.date <= t).sort((a,b)=>a.date.localeCompare(b.date)); }
+
+      const total = rows.reduce((s,x)=>s + Number(x.amount||0),0);
+      const popup = window.open("", "_blank", "width=900,height=700");
+      const html = `
+        <html>
+          <head>
+            <title>Xpensive Report - ${title}</title>
+            <style>
+              body{font-family:Arial,Helvetica,sans-serif;padding:20px;color:#111}
+              h1{color:#111}
+              table{width:100%;border-collapse:collapse}
+              th,td{padding:8px;border:1px solid #ddd;text-align:left}
+              .muted{color:#666;font-size:14px}
+            </style>
+          </head>
+          <body>
+            <h1>Xpensive — Expense Report</h1>
+            <div class="muted">Period: ${title}</div>
+            <div class="muted">Generated: ${new Date().toISOString().slice(0,10)}</div>
+            <div style="margin-top:10px;font-weight:700">Total Spent: ₹${fmt(total)}</div>
+            <table style="margin-top:12px">
+              <thead><tr><th>Date</th><th>Category</th><th>Amount</th><th>Notes</th></tr></thead>
+              <tbody>
+                ${rows.map(r => `<tr><td>${r.date}</td><td>${r.category}</td><td>₹${fmt(r.amount)}</td><td>${(r.notes||"")}</td></tr>`).join("")}
+              </tbody>
+            </table>
+          </body>
+        </html>
+      `;
+      popup.document.write(html);
+      popup.document.close();
+      popup.focus();
+      // wait a bit for render then print
+      setTimeout(()=>popup.print(), 600);
+    });
+
     /* ================ End ================ */
-  </script></body>
-  </html>
+
+  </script>
+</body>
+</html>
